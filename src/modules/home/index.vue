@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import { ref } from 'vue';
+import DoingCard from './components/doing-card.vue';
 
 const test = ref('test');
 </script>
 
 <template>
-  <div>home {{ test }}</div>
+  <div>
+    <doing-card />
+  </div>
 </template>

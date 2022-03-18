@@ -1,15 +1,13 @@
 <script setup lang="ts">
-import Tabbar from './modules/common/components/tabbar.vue';
+import { onLaunch, onShow, onHide } from '@dcloudio/uni-app';
+onLaunch(() => {
+  console.log('App Launch');
+});
+onShow(() => {
+  console.log('App Show');
+});
+onHide(() => {
+  console.log('App Hide');
+});
 </script>
-
-<template>
-  <router-view></router-view>
-  <tabbar />
-</template>
-
-<style>
-body {
-  margin: 0;
-  padding: 0;
-}
-</style>
+<style></style>

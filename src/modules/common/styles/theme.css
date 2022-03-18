@@ -1,8 +1,35 @@
 page {
   --primary-color: #319a64;
+  --pink-color: #f095a965;
+  --blue-color: #56add665;
 
   --primary-text-color: #06110b;
   --gray-text-color: #a8a8a8;
+  --white-text-color: #f5fffa;
+  --pink-text-color: #ce124c;
+  --blue-text-color: #005aac;
 
   --primary-bg-color: #cff4e2;
+}
+
+@font-face {
+  font-family: 'iconfont'; /* Project id 3258977 */
+  src: url('../../../static/font/iconfont.woff2?t=1647611939861')
+      format('woff2'),
+    url('../../../static/font/iconfont.woff?t=1647611939861')
+      format('woff'),
+    url('../../../static/font/iconfont.ttf?t=1647611939861')
+      format('truetype');
+}
+
+.iconfont {
+  font-family: 'iconfont' !important;
+  font-size: 16px;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-close:before {
+  content: '\e668';
 }

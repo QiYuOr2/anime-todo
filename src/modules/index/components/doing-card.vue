@@ -6,17 +6,19 @@
       mode="heightFix"
     />
     <view class="info">
-      <view class="title">{{ title }}</view>
+      <view class="title">{{ info.title }}</view>
       <view class="status">
-        <text>看到第 4 话</text>
+        <text>第 {{ info.cur }}/{{ info.total }} 话</text>
         <text class="divider">|</text>
-        <text>每周六 01:30 更新</text>
+        <text v-if="info.time">{{ info.time }} 更新</text>
+        <text v-else>已完结</text>
       </view>
       <view class="tags">
-        <tag>恋爱</tag>
+        <tag v-for="(t, i) in info.tags" :key="i" random>{{ t }}</tag>
       </view>
       <view class="footer">
-        <x-button>看了1话</x-button>
+        <x-button @click="clickOneHandler">看一话</x-button>
+        <x-button @click="clickMoreHandler">选择</x-button>
       </view>
     </view>
   </view>
@@ -25,10 +27,35 @@
 <script lang="ts" setup>
 import Tag from '../../common/components/tag.vue';
 import XButton from '../../common/components/button.vue';
+import { PropType } from 'vue';
 
-defineProps({
-  title: String,
+type Info = {
+  title: string;
+  img: string;
+  time: string;
+  total: string | number;
+  cur: string | number;
+  tags: string[];
+};
+
+const props = defineProps({
+  info: { type: Object as PropType<Info>, required: true },
 });
+
+const emit = defineEmits<{
+  (event: 'single'): void;
+  (
+    event: 'more',
+    value: { cur: number | string; total: number | string }
+  ): void;
+}>();
+
+const clickOneHandler = () => {
+  emit('single');
+};
+const clickMoreHandler = () => {
+  emit('more', { cur: props.info.cur, total: props.info.total });
+};
 </script>
 
 <style scoped>
@@ -69,7 +96,21 @@ defineProps({
   font-size: 28rpx;
 }
 
+.info .tags > tag {
+  margin-right: 10rpx;
+}
+.info .tags > tag:last-child {
+  margin-right: 0;
+}
+
 .info .footer {
   margin-top: auto;
+  text-align: right;
+}
+.info .footer > x-button {
+  margin-right: 18rpx;
+}
+.info .footer > x-button:last-child {
+  margin-right: 0;
 }
 </style>

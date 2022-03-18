@@ -1,16 +1,41 @@
 {
-	"pages": [
-		{
-			"path": "pages/index/index",
-			"style": {
-				"navigationBarTitleText": "uni-app"
-			}
-		}
-	],
-	"globalStyle": {
-		"navigationBarTextStyle": "black",
-		"navigationBarTitleText": "uni-app",
-		"navigationBarBackgroundColor": "#F8F8F8",
-		"backgroundColor": "#F8F8F8"
-	}
+  "pages": [
+    {
+      "path": "modules/index/index",
+      "style": {
+        "navigationBarTitleText": "追番"
+      }
+    },
+    {
+      "path": "modules/settings/index",
+      "style": {
+        "navigationBarTitleText": "设置"
+      }
+    }
+  ],
+  "globalStyle": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "uni-app",
+    "navigationBarBackgroundColor": "#F8F8F8",
+    "backgroundColor": "#F8F8F8"
+  },
+  "tabBar": {
+    "color": "#aaaaaa",
+    "selectedColor": "#319a64",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "modules/index/index",
+        "iconPath": "static/icons/tv.png",
+        "selectedIconPath": "static/icons/tv-green.png",
+        "text": "追番"
+      },
+      {
+        "pagePath": "modules/settings/index",
+        "iconPath": "static/icons/settings.png",
+        "selectedIconPath": "static/icons/settings-green.png",
+        "text": "设置"
+      }
+    ]
+  }
 }

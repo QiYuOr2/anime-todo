@@ -10,7 +10,11 @@
     <view v-if="currentTab === 0">
       <view v-if="list.length === 0" class="empty">还没有正在看的番剧哦~</view>
       <view class="item" v-for="(item, i) in list" :key="i">
-        <doing-card :info="item" @single="addOne" @more="addMore" />
+        <doing-card
+          :info="item"
+          @single="addOne(i)"
+          @more="addMore($event, i)"
+        />
       </view>
     </view>
     <view v-if="currentTab === 1" class="list--finish">
@@ -20,14 +24,14 @@
       <block v-else>
         <view class="left">
           <block v-for="(fItem, i) in finishList" :key="i">
-            <view class="item" v-if="i % 2 !== 0">
+            <view class="item" v-if="i % 2 === 0">
               <finish-card :title="fItem.title" />
             </view>
           </block>
         </view>
         <view class="right">
           <block v-for="(fItem, i) in finishList" :key="i">
-            <view class="item" v-if="i % 2 === 0">
+            <view class="item" v-if="i % 2 !== 0">
               <finish-card :title="fItem.title" />
             </view>
           </block>
@@ -51,7 +55,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
+import { ref } from 'vue';
 import DoingCard from './components/doing-card.vue';
 import Modal from '../common/components/modal.vue';
 import XButton from '../common/components/button.vue';
@@ -59,6 +63,7 @@ import TabBar from './components/tab-bar.vue';
 import XIcon from '../common/components/icon.vue';
 import FinishCard from './components/finish-card.vue';
 import { Local } from '../common/local';
+import { onShow } from '@dcloudio/uni-app';
 
 type Anime = {
   title: string;
@@ -69,37 +74,29 @@ type Anime = {
   tags: string[];
 };
 
-const list = ref<Anime[]>([
-  // {
-  //   title: '擅长捉弄的高木同学3',
-  //   img: 'https://cdn.jsdelivr.net/gh/qiyuor2/blog-image/img/20220318-takagi17.jpeg',
-  //   time: '每周六 01:30',
-  //   total: 12,
-  //   cur: 4,
-  //   tags: ['校园', '恋爱'],
-  // },
-  // {
-  //   title: '擅长捉弄的高木同学3',
-  //   img: 'https://cdn.jsdelivr.net/gh/qiyuor2/blog-image/img/20220318-takagi17.jpeg',
-  //   time: '每周六 01:30',
-  //   total: 12,
-  //   cur: 4,
-  //   tags: ['校园', '恋爱'],
-  // },
-]);
+const list = ref<Anime[]>([]);
 
-const finishList = ref<Anime[]>([
-  // { title: 'JOJO的奇妙冒险-星尘远征军' },
-  // { title: '曾几何时沦为天魔的黑兔' },
-  // { title: '魔法少女小圆 正篇' },
-  // { title: 'Fate Zero' },
-  // { title: 'Fate Stay Night' },
-  // { title: '鬼灭之刃' },
-]);
+const finishList = ref<Anime[]>([]);
 
-onMounted(() => {
+const writeToLocal = () => {
+  Local.create().write(
+    JSON.stringify({
+      list: list.value,
+      finishList: finishList.value,
+    })
+  );
+};
+
+onShow(() => {
   const fs = Local.create();
-  console.log(fs.read());
+  const [err, data] = fs.read();
+  if (err) {
+    // uni.showToast({ icon: 'none', title: '数据读取错误' });
+    return;
+  }
+  const dataStr = JSON.parse(data);
+  list.value = dataStr.list;
+  finishList.value = dataStr.finishList;
 });
 
 const currentTab = ref(0);
@@ -108,16 +105,60 @@ const toAdd = () => {
   uni.navigateTo({ url: '/modules/edit/index' });
 };
 
+const addOne = (index: number) => {
+  const source = list.value;
+
+  source[index].cur = source[index].cur + 1;
+  const cur = source[index].cur;
+
+  if (cur === source[index].total) {
+    const currentItem = source[index];
+
+    uni.showToast({ title: '看完这部番啦！', icon: 'none' });
+
+    list.value = source.filter((_, i) => i !== index);
+    finishList.value = [...finishList.value, currentItem];
+
+    writeToLocal();
+    return;
+  }
+  list.value = source;
+  writeToLocal();
+};
+
 const addModealVisible = ref(false);
 const totalNum = ref(0);
+const currentEditIndex = ref(0);
 
-const addOne = () => {};
-const addMore = (values: { cur: string | number; total: string | number }) => {
+const addMore = (
+  values: { cur: string | number; total: string | number },
+  index: number
+) => {
+  currentEditIndex.value = index;
   totalNum.value = Number(values.total);
   addModealVisible.value = true;
 };
 const selectNumHandler = (num: number) => {
   addModealVisible.value = false;
+
+  const source = list.value;
+  source[currentEditIndex.value].cur = num;
+
+  const cur = source[currentEditIndex.value].cur;
+
+  if (cur === source[currentEditIndex.value].total) {
+    const currentItem = source[currentEditIndex.value];
+
+    uni.showToast({ title: '看完这部番啦！', icon: 'none' });
+
+    list.value = source.filter((_, i) => i !== currentEditIndex.value);
+    finishList.value = [...finishList.value, currentItem];
+
+    writeToLocal();
+    return;
+  }
+  list.value = source;
+  writeToLocal();
 };
 </script>
 

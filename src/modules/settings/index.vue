@@ -20,7 +20,7 @@
     </settings-card>
 
     <settings-card title="其他">
-      <view class="settings-item">
+      <view class="settings-item" @click="toAbout">
         <text>关于</text>
         <x-icon name="arrow-right" />
       </view>
@@ -110,7 +110,38 @@ const exportJson = () => {
 };
 
 const example = () => {
-  json.value = '测试';
+  json.value = JSON.stringify({
+    list: [
+      {
+        title: '擅长捉弄的高木同学3',
+        img: 'https://cdn.jsdelivr.net/gh/qiyuor2/blog-image/img/20220318-takagi17.jpeg',
+        time: '每周六 01:30',
+        total: 12,
+        cur: 11,
+        tags: ['校园', '恋爱'],
+      },
+    ],
+    finishList: [
+      {
+        title: '擅长捉弄的高木同学1',
+        img: 'https://cdn.jsdelivr.net/gh/qiyuor2/blog-image/img/20220318-takagi17.jpeg',
+        total: 12,
+        cur: 12,
+        tags: ['校园', '恋爱'],
+      },
+      {
+        title: '擅长捉弄的高木同学2',
+        img: 'https://cdn.jsdelivr.net/gh/qiyuor2/blog-image/img/20220318-takagi17.jpeg',
+        total: 12,
+        cur: 12,
+        tags: ['校园', '恋爱'],
+      },
+    ],
+  });
+};
+
+const toAbout = () => {
+  uni.navigateTo({ url: '/modules/settings/about' });
 };
 </script>
 
@@ -120,7 +151,7 @@ const example = () => {
   max-height: 300rpx;
   border-radius: 4rpx;
   padding: 10rpx;
-  border: 2rpx solid var(--gray-text-color);
+  border: 2rpx solid var(--gray2-text-color);
 }
 textarea {
   width: 100%;

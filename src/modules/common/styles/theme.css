@@ -8,6 +8,7 @@ page {
 
   --primary-text-color: #06110b;
   --gray-text-color: #a8a8a8;
+  --gray2-text-color: #cccccc;
   --white-text-color: #f5fffa;
   --pink-text-color: #ce124c;
   --blue-text-color: #005aac;
@@ -31,6 +32,10 @@ page {
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-picture:before {
+  content: '\e67c';
 }
 
 .icon-close:before {

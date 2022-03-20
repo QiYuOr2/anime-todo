@@ -1,10 +1,6 @@
 <template>
   <view class="doing-card">
-    <image
-      class="thumb"
-      src="https://cdn.jsdelivr.net/gh/qiyuor2/blog-image/img/20220318-takagi17.jpeg"
-      mode="heightFix"
-    />
+    <image class="thumb" :src="info.img" mode="aspectFill" />
     <view class="info">
       <view class="title">{{ info.title }}</view>
       <view class="status">
@@ -73,8 +69,7 @@ const clickMoreHandler = () => {
   box-shadow: 0 0rpx 32rpx 5rpx rgba(0, 0, 0, 0.06);
 }
 .thumb {
-  max-width: 150rpx;
-  min-width: 120rpx;
+  width: 140rpx;
   height: 200rpx;
   margin-right: 24rpx;
   background: #f1f1f1;

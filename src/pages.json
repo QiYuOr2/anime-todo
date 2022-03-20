@@ -11,6 +11,12 @@
       "style": {
         "navigationBarTitleText": "设置"
       }
+    },
+    {
+      "path": "modules/edit/index",
+      "style": {
+        "navigationBarTitleText": "编辑"
+      }
     }
   ],
   "globalStyle": {

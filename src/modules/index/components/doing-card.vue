@@ -73,7 +73,8 @@ const clickMoreHandler = () => {
   box-shadow: 0 0rpx 32rpx 5rpx rgba(0, 0, 0, 0.06);
 }
 .thumb {
-  width: 150rpx;
+  max-width: 150rpx;
+  min-width: 120rpx;
   height: 200rpx;
   margin-right: 24rpx;
   background: #f1f1f1;

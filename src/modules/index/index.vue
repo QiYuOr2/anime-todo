@@ -1,8 +1,18 @@
 <template>
   <view class="index">
-    <view class="item" v-for="(item, i) in list" :key="i">
-      <doing-card :info="item" @single="addOne" @more="addMore" />
+    <view class="index__header">
+      <tab-bar v-model:current="currentTab" :tabs="tabs" />
+      <view class="plus-icon" @click="toAdd">
+        <x-icon name="add-circle" :size="36" />
+      </view>
     </view>
+
+    <view v-show="currentTab === 0">
+      <view class="item" v-for="(item, i) in list" :key="i">
+        <doing-card :info="item" @single="addOne" @more="addMore" />
+      </view>
+    </view>
+    <view v-show="currentTab === 1"> </view>
 
     <modal v-model:visible="addModealVisible" title="选择集数">
       <view class="modal-content">
@@ -24,6 +34,8 @@ import { ref } from 'vue';
 import DoingCard from './components/doing-card.vue';
 import Modal from '../common/components/modal.vue';
 import XButton from '../common/components/button.vue';
+import TabBar from './components/tab-bar.vue';
+import XIcon from '../common/components/icon.vue';
 
 const list = ref([
   {
@@ -43,6 +55,12 @@ const list = ref([
     tags: ['校园', '恋爱'],
   },
 ]);
+
+const currentTab = ref(0);
+const tabs = ['观看中', '已看完'];
+const toAdd = () => {
+  console.log('toAdd');
+};
 
 const addModealVisible = ref(false);
 const totalNum = ref(0);
@@ -68,6 +86,19 @@ const selectNumHandler = (num: number) => {
 <style scoped>
 .index {
   padding: 1rem;
+}
+
+.index__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-bottom: 30rpx;
+  padding-right: 20rpx;
+}
+
+.index__header .plus-icon {
+  padding: 10rpx;
 }
 
 .index .item {

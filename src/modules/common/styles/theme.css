@@ -1,5 +1,7 @@
 page {
   --primary-color: #319a64;
+  --primary-dark-color: #277e51;
+  --primary-dark2-color: #0622131;
   --pink-color: #f095a965;
   --blue-color: #56add665;
 
@@ -10,16 +12,16 @@ page {
   --blue-text-color: #005aac;
 
   --primary-bg-color: #cff4e2;
+
+  --gray-divider-color: #ececec;
 }
 
 @font-face {
   font-family: 'iconfont'; /* Project id 3258977 */
   src: url('../../../static/font/iconfont.woff2?t=1647611939861')
       format('woff2'),
-    url('../../../static/font/iconfont.woff?t=1647611939861')
-      format('woff'),
-    url('../../../static/font/iconfont.ttf?t=1647611939861')
-      format('truetype');
+    url('../../../static/font/iconfont.woff?t=1647611939861') format('woff'),
+    url('../../../static/font/iconfont.ttf?t=1647611939861') format('truetype');
 }
 
 .iconfont {
@@ -32,4 +34,12 @@ page {
 
 .icon-close:before {
   content: '\e668';
+}
+
+.icon-arrow-right:before {
+  content: '\e665';
+}
+
+.icon-add-circle:before {
+  content: '\e664';
 }

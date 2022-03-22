@@ -1,6 +1,9 @@
 <template>
-  <view class="doing-card">
-    <image class="thumb" :src="info.img" mode="aspectFill" />
+  <view class="doing-card" @click="clickDetailHandler">
+    <image v-if="info.img" class="thumb" :src="info.img" mode="aspectFill" />
+    <view v-else class="thumb thumb--empty">
+      <x-icon name="picture" :size="40" />
+    </view>
     <view class="info">
       <view class="title">{{ info.title }}</view>
       <view class="status">
@@ -12,7 +15,7 @@
       <view class="tags">
         <tag v-for="(t, i) in info.tags" :key="i" random>{{ t }}</tag>
       </view>
-      <view class="footer">
+      <view v-if="!hideActions" class="footer">
         <x-button @click="clickOneHandler">看一话</x-button>
         <x-button @click="clickMoreHandler">选择</x-button>
       </view>
@@ -24,26 +27,18 @@
 import Tag from '../../common/components/tag.vue';
 import XButton from '../../common/components/button.vue';
 import { PropType } from 'vue';
-
-type Info = {
-  title: string;
-  img: string;
-  time: string;
-  total: string | number;
-  cur: string | number;
-  tags: string[];
-};
+import { Anime } from '../../common/types';
+import XIcon from '../../common/components/icon.vue';
 
 const props = defineProps({
-  info: { type: Object as PropType<Info>, required: true },
+  info: { type: Object as PropType<Anime>, required: true },
+  hideActions: { type: Boolean, default: false },
 });
 
 const emit = defineEmits<{
   (event: 'single'): void;
-  (
-    event: 'more',
-    value: { cur: number | string; total: number | string }
-  ): void;
+  (event: 'more', value: { cur: number | string; total: number | string }): void;
+  (event: 'detail', value: Anime): void;
 }>();
 
 const clickOneHandler = () => {
@@ -51,6 +46,9 @@ const clickOneHandler = () => {
 };
 const clickMoreHandler = () => {
   emit('more', { cur: props.info.cur, total: props.info.total });
+};
+const clickDetailHandler = () => {
+  emit('detail', props.info);
 };
 </script>
 
@@ -75,6 +73,11 @@ const clickMoreHandler = () => {
   background: #f1f1f1;
   border-radius: 24rpx;
 }
+.thumb--empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 .info {
   flex: 1;
 
@@ -89,7 +92,7 @@ const clickMoreHandler = () => {
   margin: 10rpx 0;
 
   color: var(--gray-text-color);
-  font-size: 28rpx;
+  font-size: 24rpx;
 }
 
 .info .tags > tag {

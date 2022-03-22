@@ -14,13 +14,12 @@
           :info="item"
           @single="addOne(i)"
           @more="addMore($event, i)"
+          @detail="showDetail"
         />
       </view>
     </view>
     <view v-if="currentTab === 1" class="list--finish">
-      <view v-if="finishList.length === 0" class="empty">
-        还没有已经看完的番剧哦~
-      </view>
+      <view v-if="finishList.length === 0" class="empty">还没有已经看完的番剧哦~</view>
       <block v-else>
         <view class="left">
           <block v-for="(fItem, i) in finishList" :key="i">
@@ -46,33 +45,29 @@
           v-for="i in totalNum"
           :key="i"
           @click="selectNumHandler(i)"
+          :plain="currentEditCur < i"
         >
           {{ i }}
         </x-button>
       </view>
     </modal>
+
+    <modal v-model:visible="detailModalVisible" title="详情"></modal>
   </view>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue';
+import { onShow } from '@dcloudio/uni-app';
+import { Local } from '../common/local';
+
 import DoingCard from './components/doing-card.vue';
 import Modal from '../common/components/modal.vue';
 import XButton from '../common/components/button.vue';
 import TabBar from './components/tab-bar.vue';
 import XIcon from '../common/components/icon.vue';
 import FinishCard from './components/finish-card.vue';
-import { Local } from '../common/local';
-import { onShow } from '@dcloudio/uni-app';
-
-type Anime = {
-  title: string;
-  img: string;
-  time: string;
-  total: number;
-  cur: number;
-  tags: string[];
-};
+import { Anime } from '../common/types';
 
 const list = ref<Anime[]>([]);
 
@@ -105,6 +100,7 @@ const toAdd = () => {
   uni.navigateTo({ url: '/modules/edit/index' });
 };
 
+//#region 修改已看级数
 const addOne = (index: number) => {
   const source = list.value;
 
@@ -129,12 +125,11 @@ const addOne = (index: number) => {
 const addModealVisible = ref(false);
 const totalNum = ref(0);
 const currentEditIndex = ref(0);
+const currentEditCur = ref(0);
 
-const addMore = (
-  values: { cur: string | number; total: string | number },
-  index: number
-) => {
+const addMore = (values: { cur: string | number; total: string | number }, index: number) => {
   currentEditIndex.value = index;
+  currentEditCur.value = Number(values.cur);
   totalNum.value = Number(values.total);
   addModealVisible.value = true;
 };
@@ -159,6 +154,14 @@ const selectNumHandler = (num: number) => {
   }
   list.value = source;
   writeToLocal();
+};
+
+//#endregion
+
+const detailModalVisible = ref(false);
+const showDetail = (detail: Anime) => {
+  detailModalVisible.value = true;
+  console.log(detail);
 };
 </script>
 

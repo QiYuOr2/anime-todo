@@ -1,14 +1,17 @@
 const BaseUrl = `https://api.bgm.tv/`;
 
-const request = (url: string, options?: any) =>
+const request: <T = any>(url: string, options?: any) => Promise<T> = (
+  url,
+  options
+) =>
   new Promise((resolve, reject) => {
     uni.request({
       url: `${BaseUrl}${url}`,
       method: 'GET',
-      
-      data: options.data,
+
+      data: options?.data,
       success(data) {
-        resolve(data);
+        resolve(data as any);
       },
       fail(err) {
         reject(err);
@@ -16,11 +19,16 @@ const request = (url: string, options?: any) =>
     });
   });
 
-export const search = (keywords: string) => {
+export const search = (keywords: string, start: number = 0) => {
   return request(`search/subject/${encodeURIComponent(keywords)}`, {
     data: {
       type: 2,
       responseGroup: 'medium',
+      start,
     },
   });
+};
+
+export const calendar = () => {
+  return request(`calendar`);
 };

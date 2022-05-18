@@ -21,7 +21,14 @@
     {
       "path": "modules/edit/index",
       "style": {
-        "navigationBarTitleText": "编辑"
+        "navigationBarTitleText": "添加",
+        "onReachBottomDistance": 10
+      }
+    },
+    {
+      "path": "modules/edit/custom",
+      "style": {
+        "navigationBarTitleText": "自定义"
       }
     }
   ],

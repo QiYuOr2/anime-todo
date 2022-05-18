@@ -13,11 +13,11 @@
         <text v-else>已完结</text>
       </view>
       <view class="tags">
-        <tag v-for="(t, i) in info.tags" :key="i" random>{{ t }}</tag>
+        <!-- <tag v-for="(t, i) in info.tags" :key="i" random>{{ t }}</tag> -->
       </view>
       <view v-if="!hideActions" class="footer">
         <x-button @click="clickOneHandler">看一话</x-button>
-        <x-button @click="clickMoreHandler">选择</x-button>
+        <x-button @click="clickMoreHandler">选择进度</x-button>
       </view>
     </view>
   </view>

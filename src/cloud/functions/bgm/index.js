@@ -36,7 +36,7 @@ const getInfo = async ({ id, other }) => {
   const infoBox = data.infobox.reduce((result, current) => {
     switch (current.key) {
       case '话数':
-        result['total'] = current.value;
+        result['total'] = Number(current.value) || other.eps;
         break;
       case '放送开始':
         result['start'] = current.value;
@@ -50,6 +50,11 @@ const getInfo = async ({ id, other }) => {
     }
     return result;
   }, {});
+
+  let tags = [];
+  data.tags[0] && tags.push(data.tags[0].name);
+  data.tags[1] && tags.push(data.tags[2].name);
+
   return {
     data: {
       ...infoBox,
@@ -60,7 +65,7 @@ const getInfo = async ({ id, other }) => {
           ? `每${infoBox.weekday.replace('星期', '周')}更新`
           : '',
       desc: data.summary.trim().slice(0, 200) + '...',
-      tags: [data.tags[0].name, data.tags[1].name],
+      tags,
     },
     api: 'getInfo',
   };

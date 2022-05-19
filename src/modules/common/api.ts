@@ -20,13 +20,14 @@ export const calendar = async () => {
   return result;
 };
 
-export const getInfo = async (id: number) => {
+export const getInfo = async (id: number, anime: any) => {
   const { result } = await wx.cloud.callFunction({
     name: 'bgm',
     data: {
       api: 'getInfo',
       data: {
         id,
+        other: anime,
       },
     },
   });

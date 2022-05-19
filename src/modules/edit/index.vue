@@ -39,7 +39,7 @@ const currentAnime = ref<Record<string, string | boolean | null>>({});
 const setCurrentAnime = async (anime: any) => {
   detailModalVisible.value = true;
   uni.showLoading({ title: '加载中' });
-  const { data } = await getInfo(anime.id);
+  const { data } = await getInfo(anime.id, anime);
   currentAnime.value = data;
   uni.hideLoading();
 };

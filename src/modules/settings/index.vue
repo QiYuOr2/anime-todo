@@ -36,6 +36,7 @@
           :value="json"
           @input="jsonInputHandler"
           class="textarea__core"
+          maxlength="9999999999"
           auto-height
         />
       </view>
@@ -202,6 +203,7 @@ const toAbout = () => {
   border-radius: 4rpx;
   padding: 10rpx;
   border: 2rpx solid var(--gray2-text-color);
+  overflow: hidden;
 }
 textarea {
   width: 100%;

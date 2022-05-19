@@ -14,24 +14,26 @@
           :info="item"
           @single="addOne(i)"
           @more="addMore($event, i)"
-          @detail="showDetail"
+          @detail="showDetail(item)"
         />
       </view>
     </view>
     <view v-if="currentTab === 1" class="list--finish">
-      <view v-if="finishList.length === 0" class="empty">还没有已经看完的番剧哦~</view>
+      <view v-if="finishList.length === 0" class="empty">
+        还没有已经看完的番剧哦~
+      </view>
       <block v-else>
         <view class="left">
           <block v-for="(fItem, i) in finishList" :key="i">
             <view class="item" v-if="i % 2 === 0">
-              <finish-card :title="fItem.title" />
+              <finish-card :info="fItem" @detail="showDetail(fItem)" />
             </view>
           </block>
         </view>
         <view class="right">
           <block v-for="(fItem, i) in finishList" :key="i">
             <view class="item" v-if="i % 2 !== 0">
-              <finish-card :title="fItem.title" />
+              <finish-card :info="fItem" @detail="showDetail(fItem)" />
             </view>
           </block>
         </view>
@@ -52,7 +54,36 @@
       </view>
     </modal>
 
-    <modal v-model:visible="detailModalVisible" title="详情"></modal>
+    <modal v-model:visible="detailModalVisible" title="详情" width="600rpx">
+      <view class="wrapper">
+        <view class="detail">
+          <view>
+            <image
+              v-if="currentAnime.img"
+              class="thumb"
+              :src="currentAnime.img"
+              mode="widthFix"
+            />
+            <view v-else class="thumb thumb--empty">
+              <x-icon name="picture" :size="40" />
+            </view>
+          </view>
+          <view class="info">
+            <view>{{ currentAnime.title }}</view>
+            <view class="start">{{ currentAnime.start }}开始放送</view>
+            <view class="time">
+              <text v-if="currentAnime.total">
+                共 {{ currentAnime.total }} 话
+              </text>
+              <text v-if="currentAnime.time">
+                {{ currentAnime.time }}
+              </text>
+            </view>
+          </view>
+        </view>
+        <view class="desc">{{ currentAnime.desc }}</view>
+      </view>
+    </modal>
   </view>
 </template>
 
@@ -127,7 +158,10 @@ const totalNum = ref(0);
 const currentEditIndex = ref(0);
 const currentEditCur = ref(0);
 
-const addMore = (values: { cur: string | number; total: string | number }, index: number) => {
+const addMore = (
+  values: { cur: string | number; total: string | number },
+  index: number
+) => {
   currentEditIndex.value = index;
   currentEditCur.value = Number(values.cur);
   totalNum.value = Number(values.total);
@@ -159,9 +193,11 @@ const selectNumHandler = (num: number) => {
 //#endregion
 
 const detailModalVisible = ref(false);
+const currentAnime = ref<Record<string, any>>({});
 const showDetail = (detail: Anime) => {
-  detailModalVisible.value = true;
   console.log(detail);
+  detailModalVisible.value = true;
+  currentAnime.value = detail;
 };
 </script>
 
@@ -226,5 +262,38 @@ const showDetail = (detail: Anime) => {
   max-height: 600rpx;
   margin-top: 20rpx;
   overflow-y: auto;
+}
+
+.detail {
+  padding: 20rpx 0 0;
+  display: flex;
+  color: var(--primary-text-color);
+}
+
+.detail .thumb {
+  width: 170rpx;
+  border-radius: 14rpx;
+  margin-right: 20rpx;
+}
+
+.detail .thumb--empty {
+  width: 170rpx;
+  height: 300rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f1f1f1;
+}
+
+.detail .time {
+  font-size: 26rpx;
+  color: var(--gray-text-color);
+}
+.detail .start {
+  padding: 8rpx 0;
+  font-size: 26rpx;
+}
+.desc {
+  padding: 10rpx 0;
 }
 </style>

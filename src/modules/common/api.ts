@@ -1,34 +1,34 @@
-const BaseUrl = `https://api.bgm.tv/`;
-
-const request: <T = any>(url: string, options?: any) => Promise<T> = (
-  url,
-  options
-) =>
-  new Promise((resolve, reject) => {
-    uni.request({
-      url: `${BaseUrl}${url}`,
-      method: 'GET',
-
-      data: options?.data,
-      success(data) {
-        resolve(data as any);
-      },
-      fail(err) {
-        reject(err);
-      },
-    });
-  });
-
-export const search = (keywords: string, start: number = 0) => {
-  return request(`search/subject/${encodeURIComponent(keywords)}`, {
+export const search = async (keywords: string, start: number = 0) => {
+  const { result } = await wx.cloud.callFunction({
+    name: 'bgm',
     data: {
-      type: 2,
-      responseGroup: 'medium',
-      start,
+      api: 'search',
+      data: {
+        keywords,
+        start,
+      },
     },
   });
+  return result;
 };
 
-export const calendar = () => {
-  return request(`calendar`);
+export const calendar = async () => {
+  const { result } = await wx.cloud.callFunction({
+    name: 'bgm',
+    data: { api: 'calendar' },
+  });
+  return result;
+};
+
+export const getInfo = async (id: number) => {
+  const { result } = await wx.cloud.callFunction({
+    name: 'bgm',
+    data: {
+      api: 'getInfo',
+      data: {
+        id,
+      },
+    },
+  });
+  return result;
 };

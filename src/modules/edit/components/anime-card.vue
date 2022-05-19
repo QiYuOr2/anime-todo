@@ -2,9 +2,9 @@
   <view class="anime-card">
     <view>
       <image
-        v-if="anime?.images?.large"
+        v-if="anime?.images?.common"
         class="thumb"
-        :src="anime?.images?.large"
+        :src="anime?.images?.common"
         mode="aspectFill"
       />
       <view v-else class="thumb thumb--empty">

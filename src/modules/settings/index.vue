@@ -17,6 +17,10 @@
         <text>导出数据</text>
         <x-icon name="arrow-right" />
       </view>
+      <view class="settings-item" @click="clearJson">
+        <text>清除数据</text>
+        <x-icon name="arrow-right" />
+      </view>
     </settings-card>
 
     <settings-card title="其他">
@@ -113,30 +117,76 @@ const example = () => {
   json.value = JSON.stringify({
     list: [
       {
-        title: '擅长捉弄的高木同学3',
-        img: 'https://cdn.jsdelivr.net/gh/qiyuor2/blog-image/img/20220318-takagi17.jpeg',
-        time: '每周六 01:30',
-        total: 12,
-        cur: 11,
-        tags: ['校园', '恋爱'],
+        start: '2022年6月10日',
+        weekday: '2022年6月10日',
+        total: 1,
+        thumb: 'https://lain.bgm.tv/pic/cover/c/fd/00/347888_8tn9r.jpg',
+        title: '擅长捉弄的高木同学 剧场版',
+        time: '',
+        desc: 'とある中学校、隣の席になった女の子・高木さんに、何かとからかわれる男の子・西片。\r\nどうにかして高木さんをからかい返そうと策を練るも、いつも高木さんに見透かされてしまう。\r\n季節はめぐり、3年生に進級した2人。周囲は将来を考え始め、不安と期待が入り混じる中、高木さんと西片の距離は未だ変わらぬまま。そして、中学最後の夏がはじまろうとしていた——\r\n\r\n夏休みが始まる前日、2人は帰り道で偶然ちいさな子...',
+        tags: ['剧场版', '恋爱'],
+        cur: 0,
+        img: 'https://lain.bgm.tv/pic/cover/c/fd/00/347888_8tn9r.jpg',
       },
     ],
     finishList: [
       {
-        title: '擅长捉弄的高木同学1',
-        img: 'https://cdn.jsdelivr.net/gh/qiyuor2/blog-image/img/20220318-takagi17.jpeg',
         total: 12,
+        start: '2019年7月7日',
+        weekday: '星期日',
+        thumb: 'https://lain.bgm.tv/pic/cover/c/f5/c8/271151_UB2n6.jpg',
+        title: '擅长捉弄的高木同学 第二季',
+        time: '每周日更新',
+        desc: '某所初中学校，男生西片总是被邻座的女生高木同学捉弄。他为了对此反击而用尽计策，却总是被高木同学看透。\r\n季节轮回，西片升入2年级，这一次他是否能够顺利反击高木同学呢……？...',
+        tags: ['恋爱', '狗粮'],
         cur: 12,
-        tags: ['校园', '恋爱'],
+        img: 'https://lain.bgm.tv/pic/cover/c/f5/c8/271151_UB2n6.jpg',
       },
       {
-        title: '擅长捉弄的高木同学2',
-        img: 'https://cdn.jsdelivr.net/gh/qiyuor2/blog-image/img/20220318-takagi17.jpeg',
         total: 12,
+        start: '2022年1月7日',
+        weekday: '星期五',
+        thumb: 'https://lain.bgm.tv/pic/cover/c/2d/ad/347887_5BuT8.jpg',
+        title: '擅长捉弄的高木同学 第三季',
+        time: '每周五更新',
+        desc: '“捉弄”缩短了二人的距离，\r\n2022年想要守候的初恋就在这里。\r\n\r\n在一所初中里，有一个叫做西片的男生，他时不时就会遭到同桌女生高木的捉弄。\r\n西片每次思考对策，想要捉弄回高木，都会被高木看透。\r\n\r\n于是西片每天都绞尽脑汁，想要扳回一城…\r\n然而随着时间变化的不止是季节，还有西片的心境？\r\n看似占据优势的高木似乎也发生了让她动摇的事情？\r\n\r\n是看对方喜欢自己，还是将喜欢展现给对方看——\r\n...',
+        tags: ['恋爱', '2022年1月'],
         cur: 12,
-        tags: ['校园', '恋爱'],
+        img: 'https://lain.bgm.tv/pic/cover/c/2d/ad/347887_5BuT8.jpg',
+      },
+      {
+        total: 12,
+        start: '2018年1月8日',
+        weekday: '星期一',
+        thumb: 'https://lain.bgm.tv/pic/cover/c/09/16/219200_wFT9i.jpg',
+        title: '擅长捉弄的高木同学',
+        time: '每周一更新',
+        desc: '“今天一定要捉弄高木同学，让她害羞！”\r\n某所中学，在各种方面都被邻座的女生高木同学捉弄的男生西片。\r\n他为了对此反击而每天奋斗，但……？\r\n这样的高木同学与西片带来的全力“捉弄”青春大战开始了！...',
+        tags: ['恋爱', '狗粮'],
+        cur: 12,
+        img: 'https://lain.bgm.tv/pic/cover/c/09/16/219200_wFT9i.jpg',
       },
     ],
+  });
+};
+
+const clearJson = () => {
+  uni.showModal({
+    title: '警告',
+    content: '确定要清除数据吗？',
+    success(res) {
+      if (res.confirm) {
+        Local.create().write(
+          JSON.stringify({
+            list: [],
+            finishList: [],
+          })
+        );
+        uni.showToast({ icon: 'none', title: '数据已清除' });
+      } else if (res.cancel) {
+        console.log('用户点击取消');
+      }
+    },
   });
 };
 

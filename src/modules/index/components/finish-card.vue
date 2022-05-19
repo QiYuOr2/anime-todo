@@ -1,15 +1,26 @@
 <template>
-  <view class="finish-card">
+  <view class="finish-card" @click="clickDetailHandler">
     <text class="content">
-      {{ title }}
+      {{ info.title }}
     </text>
   </view>
 </template>
 
 <script setup lang="ts">
-defineProps({
-  title: { type: String, required: true },
+import { PropType } from 'vue';
+import { Anime } from '../../common/types';
+
+const props = defineProps({
+  info: { type: Object as PropType<Anime>, required: true },
 });
+
+const emit = defineEmits<{
+  (event: 'detail', value: Anime): void;
+}>();
+
+const clickDetailHandler = () => {
+  emit('detail', props.info);
+};
 </script>
 
 <style scoped>

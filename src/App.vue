@@ -2,6 +2,8 @@
 import { onLaunch, onShow, onHide } from '@dcloudio/uni-app';
 import { Local } from './modules/common/local';
 
+wx.cloud.init();
+
 onLaunch(() => {
   console.log('App Launch');
   Local.create(uni.getFileSystemManager);

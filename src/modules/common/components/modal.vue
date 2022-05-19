@@ -1,6 +1,6 @@
 <template>
   <view v-if="selfVisible" class="mask">
-    <view class="modal">
+    <view class="modal" :style="props.width ? `width: ${width}` : ''">
       <text
         class="iconfont icon-close close"
         @click="selfVisible = false"
@@ -19,6 +19,7 @@ import { computed } from 'vue';
 const props = defineProps({
   visible: { type: Boolean, required: true },
   title: String,
+  width: String,
 });
 
 const emit = defineEmits<{

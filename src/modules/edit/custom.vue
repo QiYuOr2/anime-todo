@@ -22,11 +22,7 @@
       <view>
         <text class="title">选择已看</text>
         <view class="modal-content">
-          <x-button
-            custom-class="select-button"
-            v-for="i in Number(info.total)"
-            :key="i"
-          >
+          <x-button custom-class="select-button" v-for="i in Number(info.total)" :key="i">
             {{ i }}
           </x-button>
         </view>
@@ -37,45 +33,45 @@
 </template>
 
 <script setup lang="ts">
-import { reactive } from 'vue';
-import { Anime } from '../common/types';
-import { search } from '../common/api';
-import XButton from '../common/components/button.vue';
-import DoingCard from '../index/components/doing-card.vue';
+import { reactive } from "vue";
+import { Anime } from "../common/types";
+import { search } from "../common/api";
+import XButton from "../common/components/button.vue";
+import DoingCard from "../index/components/doing-card.vue";
 
 const info = reactive<Anime>({
-  title: '请输入标题',
-  img: '',
-  desc: '请输入简介',
-  time: '请输入时间',
+  title: "请输入标题",
+  img: "",
+  desc: "请输入简介",
+  time: "请输入时间",
   total: 12,
   cur: 0,
-  tags: ['默认tag'],
+  tags: ["默认tag"],
 });
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .edit {
   padding: 1rem 1rem 5rem;
 }
 
 .form {
   margin-top: 1rem;
-}
 
-.form .title {
-  color: var(--gray-text-color);
-  font-size: 28rpx;
-  margin: 0 0 0 10rpx;
-}
+  .title {
+    color: var(--gray-text-color);
+    font-size: 28rpx;
+    margin: 0 0 0 10rpx;
+  }
 
-.form input {
-  padding: 10rpx 32rpx;
-  margin: 14rpx 0 20rpx;
-  border-radius: 20rpx;
-  background: var(--gray-bg-color);
+  input {
+    padding: 10rpx 32rpx;
+    margin: 14rpx 0 20rpx;
+    border-radius: 20rpx;
+    background: var(--gray-bg-color);
 
-  font-size: 30rpx;
+    font-size: 30rpx;
+  }
 }
 
 .confirm {

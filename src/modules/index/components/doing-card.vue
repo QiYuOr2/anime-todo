@@ -1,5 +1,5 @@
 <template>
-  <view class="doing-card" @click="clickDetailHandler">
+  <view class="doing-card" @click="clickDetailHandler" @longpress="longpressHandler">
     <image v-if="info.img" class="thumb" :src="info.img" mode="aspectFill" />
     <view v-else class="thumb thumb--empty">
       <x-icon name="picture" :size="40" />
@@ -20,18 +20,18 @@
       </view>
       <view v-if="!hideActions" class="footer">
         <x-button @click="clickOneHandler">看一话</x-button>
-        <x-button @click="clickMoreHandler">选择进度</x-button>
+        <x-button type="other" @click="clickMoreHandler">更多</x-button>
       </view>
     </view>
   </view>
 </template>
 
 <script lang="ts" setup>
-import Tag from '../../common/components/tag.vue';
-import XButton from '../../common/components/button.vue';
-import { PropType } from 'vue';
-import { Anime } from '../../common/types';
-import XIcon from '../../common/components/icon.vue';
+import { PropType, getCurrentInstance, ref } from "vue";
+import { Anime } from "../../common/types";
+import Tag from "../../common/components/tag.vue";
+import XButton from "../../common/components/button.vue";
+import XIcon from "../../common/components/icon.vue";
 
 const props = defineProps({
   info: { type: Object as PropType<Anime>, required: true },
@@ -39,30 +39,33 @@ const props = defineProps({
 });
 
 const emit = defineEmits<{
-  (event: 'single'): void;
-  (
-    event: 'more',
-    value: { cur: number | string; total: number | string }
-  ): void;
-  (event: 'detail', value: Anime): void;
+  (event: "single"): void;
+  (event: "more", value: { cur: number | string; total: number | string; $event: Event }): void;
+  (event: "detail", value: Anime): void;
+  (event: "longpress", value: { cur: number | string; total: number | string; $event: Event }): void;
 }>();
 
 const clickOneHandler = () => {
-  emit('single');
+  emit("single");
 };
-const clickMoreHandler = () => {
-  emit('more', { cur: props.info.cur, total: props.info.total });
+const clickMoreHandler = (event: Event) => {
+  emit("more", { cur: props.info.cur, total: props.info.total, $event: event });
 };
 const clickDetailHandler = () => {
-  emit('detail', props.info);
+  emit("detail", props.info);
+};
+
+const longpressHandler = (event: Event) => {
+  emit("longpress", { cur: props.info.cur, total: props.info.total, $event: event });
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .divider {
   display: inline-block;
   margin: 0 10rpx;
 }
+
 .doing-card {
   box-sizing: border-box;
   display: flex;
@@ -71,51 +74,59 @@ const clickDetailHandler = () => {
   padding: 20rpx;
   border-radius: 36rpx;
   box-shadow: 0 0rpx 32rpx 5rpx rgba(0, 0, 0, 0.06);
-}
-.thumb {
-  width: 140rpx;
-  height: 200rpx;
-  margin-right: 24rpx;
-  background: #f1f1f1;
-  border-radius: 24rpx;
-}
-.thumb--empty {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.info {
-  flex: 1;
+  .thumb {
+    min-width: 140rpx;
+    width: 140rpx;
+    height: 200rpx;
+    margin-right: 24rpx;
+    background: #f1f1f1;
+    border-radius: 24rpx;
+    &--empty {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
 
-  display: flex;
-  flex-direction: column;
-}
-.info .title {
-  color: var(--primary-text-color);
-}
+  .info {
+    flex: 1;
+    max-width: calc(100% - 165rpx);
 
-.info .status {
-  margin: 10rpx 0;
+    display: flex;
+    flex-direction: column;
+    .title {
+      display: inline-block;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
 
-  color: var(--gray-text-color);
-  font-size: 24rpx;
-}
+      color: var(--primary-text-color);
+    }
 
-.info .tags > tag {
-  margin-right: 10rpx;
-}
-.info .tags > tag:last-child {
-  margin-right: 0;
-}
+    .status {
+      margin: 10rpx 0;
 
-.info .footer {
-  margin-top: auto;
-  text-align: right;
-}
-.info .footer > x-button {
-  margin-right: 18rpx;
-}
-.info .footer > x-button:last-child {
-  margin-right: 0;
+      color: var(--gray-text-color);
+      font-size: 24rpx;
+    }
+
+    .tags > tag {
+      margin-right: 10rpx;
+    }
+    .tags > tag:last-child {
+      margin-right: 0;
+    }
+
+    .footer {
+      margin-top: auto;
+      text-align: right;
+    }
+    .footer > x-button {
+      margin-right: 10rpx;
+    }
+    .footer > x-button:last-child {
+      margin-right: 0;
+    }
+  }
 }
 </style>

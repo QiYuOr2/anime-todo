@@ -1,6 +1,6 @@
 {
   "name": "uni-anime-todo",
-  "version": "0.0.0",
+  "version": "1.1.0",
   "scripts": {
     "dev:app": "uni -p app",
     "dev:custom": "uni -p",
@@ -54,6 +54,7 @@
     "@dcloudio/uni-automator": "^3.0.0-alpha-3040220220310005",
     "@dcloudio/uni-cli-shared": "^3.0.0-alpha-3040220220310005",
     "@dcloudio/vite-plugin-uni": "^3.0.0-alpha-3040220220310005",
+    "sass": "^1.54.0",
     "typescript": "^4.6.2",
     "vite": "^2.8.6"
   }

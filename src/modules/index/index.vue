@@ -1,5 +1,5 @@
 <template>
-  <view class="index">
+  <view class="index fixed-page" @click="clickIndexHandler" @touchmove="indexScrollHandler">
     <view class="index__header">
       <tab-bar v-model:current="currentTab" :tabs="tabs" />
       <view class="plus-icon" @click="toAdd">
@@ -7,21 +7,20 @@
       </view>
     </view>
 
-    <view v-if="currentTab === 0">
+    <view v-if="currentTab === 0" class="list">
       <view v-if="list.length === 0" class="empty">还没有正在看的番剧哦~</view>
       <view class="item" v-for="(item, i) in list" :key="i">
         <doing-card
           :info="item"
           @single="addOne(i)"
-          @more="addMore($event, i)"
+          @more="clickMore($event, i)"
           @detail="showDetail(item)"
+          @longpress="awakeMenuHandler($event, i)"
         />
       </view>
     </view>
-    <view v-if="currentTab === 1" class="list--finish">
-      <view v-if="finishList.length === 0" class="empty">
-        还没有已经看完的番剧哦~
-      </view>
+    <view v-if="currentTab === 1" class="list list--finish">
+      <view v-if="finishList.length === 0" class="empty"> 还没有已经看完的番剧哦~ </view>
       <block v-else>
         <view class="left">
           <block v-for="(fItem, i) in finishList" :key="i">
@@ -40,15 +39,20 @@
       </block>
     </view>
 
+    <view class="menu" v-if="isMenuVisible">
+      <view class="menu-item" hover-class="menu-item--active" @click="remove">
+        <x-icon name="ashbin" :size="32" />
+        <text class="menu-item__text">删除</text>
+      </view>
+      <view class="menu-item" hover-class="menu-item--active" @click="addMore">
+        <x-icon name="modular" :size="32" />
+        <text class="menu-item__text">进度</text>
+      </view>
+    </view>
+
     <modal v-model:visible="addModealVisible" title="选择集数">
       <view class="modal-content">
-        <x-button
-          custom-class="select-button"
-          v-for="i in totalNum"
-          :key="i"
-          @click="selectNumHandler(i)"
-          :plain="currentEditCur < i"
-        >
+        <x-button custom-class="select-button" v-for="i in totalNum" :key="i" @click="selectNumHandler(i)" :plain="currentEditCur < i">
           {{ i }}
         </x-button>
       </view>
@@ -58,12 +62,7 @@
       <view class="wrapper">
         <view class="detail">
           <view>
-            <image
-              v-if="currentAnime.img"
-              class="thumb"
-              :src="currentAnime.img"
-              mode="widthFix"
-            />
+            <image v-if="currentAnime.img" class="thumb" :src="currentAnime.img" mode="widthFix" />
             <view v-else class="thumb thumb--empty">
               <x-icon name="picture" :size="40" />
             </view>
@@ -72,9 +71,7 @@
             <view>{{ currentAnime.title }}</view>
             <view class="start">{{ currentAnime.start }}开始放送</view>
             <view class="time">
-              <text v-if="currentAnime.total">
-                共 {{ currentAnime.total }} 话
-              </text>
+              <text v-if="currentAnime.total"> 共 {{ currentAnime.total }} 话 </text>
               <text v-if="currentAnime.time">
                 {{ currentAnime.time }}
               </text>
@@ -88,17 +85,19 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
-import { onShow } from '@dcloudio/uni-app';
-import { Local } from '../common/local';
+import { ref } from "vue";
+import { onShow } from "@dcloudio/uni-app";
+import { Local } from "../common/local";
+import { removeOne } from "../common/utils";
+import { Anime } from "../common/types";
+import { get, set } from "@vueuse/core";
 
-import DoingCard from './components/doing-card.vue';
-import Modal from '../common/components/modal.vue';
-import XButton from '../common/components/button.vue';
-import TabBar from './components/tab-bar.vue';
-import XIcon from '../common/components/icon.vue';
-import FinishCard from './components/finish-card.vue';
-import { Anime } from '../common/types';
+import DoingCard from "./components/doing-card.vue";
+import Modal from "../common/components/modal.vue";
+import XButton from "../common/components/button.vue";
+import TabBar from "./components/tab-bar.vue";
+import XIcon from "../common/components/icon.vue";
+import FinishCard from "./components/finish-card.vue";
 
 const list = ref<Anime[]>([]);
 
@@ -126,9 +125,64 @@ onShow(() => {
 });
 
 const currentTab = ref(0);
-const tabs = ['观看中', '已看完'];
+const tabs = ["观看中", "已看完"];
 const toAdd = () => {
-  uni.navigateTo({ url: '/modules/edit/index' });
+  uni.navigateTo({ url: "/modules/edit/index" });
+};
+
+const isMenuVisible = ref(false);
+
+const indexScrollHandler = () => {
+  isMenuVisible.value = false;
+};
+
+const menuPositionX = ref("0");
+const menuPositionY = ref("0");
+
+const awakeMenuHandler = (values: { cur: string | number; total: string | number; $event: any }, index: number) => {
+  uni.vibrateShort({});
+
+  currentEditIndex.value = index;
+  currentEditCur.value = Number(values.cur);
+  totalNum.value = Number(values.total);
+
+  if (!values.$event) {
+    return;
+  }
+
+  const touched = values.$event.changedTouches[0];
+
+  // 防止菜单超出边界
+  let x = touched.clientX;
+  let y = touched.clientY;
+  if (x + 100 > 375) {
+    x -= 100;
+  }
+
+  menuPositionX.value = `${x}px`;
+  menuPositionY.value = `${y}px`;
+  isMenuVisible.value = true;
+};
+
+const clickIndexHandler = () => {
+  isMenuVisible.value = false;
+};
+
+const remove = () => {
+  uni.vibrateShort({});
+  const source = get(list);
+  uni.showModal({
+    title: "警告",
+    content: "确定要删除该记录吗？",
+    success(res) {
+      if (res.confirm) {
+        set(list, removeOne(source, currentEditIndex.value));
+        writeToLocal();
+      } else if (res.cancel) {
+        console.log("取消删除");
+      }
+    },
+  });
 };
 
 //#region 修改已看级数
@@ -141,7 +195,7 @@ const addOne = (index: number) => {
   if (cur === source[index].total) {
     const currentItem = source[index];
 
-    uni.showToast({ title: '看完这部番啦！', icon: 'none' });
+    uni.showToast({ title: "看完这部番啦！", icon: "none" });
 
     list.value = source.filter((_, i) => i !== index);
     finishList.value = [...finishList.value, currentItem];
@@ -158,13 +212,12 @@ const totalNum = ref(0);
 const currentEditIndex = ref(0);
 const currentEditCur = ref(0);
 
-const addMore = (
-  values: { cur: string | number; total: string | number },
-  index: number
-) => {
-  currentEditIndex.value = index;
-  currentEditCur.value = Number(values.cur);
-  totalNum.value = Number(values.total);
+const clickMore = (values: { cur: string | number; total: string | number; $event: Event }, index: number) => {
+  awakeMenuHandler(values, index);
+};
+const addMore = () => {
+  uni.vibrateShort({});
+  isMenuVisible.value = false;
   addModealVisible.value = true;
 };
 const selectNumHandler = (num: number) => {
@@ -178,7 +231,7 @@ const selectNumHandler = (num: number) => {
   if (cur === source[currentEditIndex.value].total) {
     const currentItem = source[currentEditIndex.value];
 
-    uni.showToast({ title: '看完这部番啦！', icon: 'none' });
+    uni.showToast({ title: "看完这部番啦！", icon: "none" });
 
     list.value = source.filter((_, i) => i !== currentEditIndex.value);
     finishList.value = [...finishList.value, currentItem];
@@ -209,9 +262,25 @@ const showDetail = (detail: Anime) => {
 }
 </style>
 
-<style scoped>
+<style scoped lang="scss">
 .index {
   padding: 1rem;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    margin-bottom: 30rpx;
+    padding-right: 20rpx;
+  }
+
+  &__header .plus-icon {
+    padding: 10rpx;
+  }
+  .item {
+    margin-bottom: 1rem;
+  }
 }
 
 .empty {
@@ -223,21 +292,10 @@ const showDetail = (detail: Anime) => {
   color: var(--gray-text-color);
 }
 
-.index__header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-
-  margin-bottom: 30rpx;
-  padding-right: 20rpx;
-}
-
-.index__header .plus-icon {
-  padding: 10rpx;
-}
-
-.list--finish {
-  display: flex;
+.list {
+  &--finish {
+    display: flex;
+  }
 }
 
 .left,
@@ -247,10 +305,6 @@ const showDetail = (detail: Anime) => {
 
 .left {
   margin-right: 30rpx;
-}
-
-.index .item {
-  margin-bottom: 1rem;
 }
 
 .modal-content {
@@ -268,32 +322,62 @@ const showDetail = (detail: Anime) => {
   padding: 20rpx 0 0;
   display: flex;
   color: var(--primary-text-color);
-}
 
-.detail .thumb {
-  width: 170rpx;
-  border-radius: 14rpx;
-  margin-right: 20rpx;
-}
+  .thumb {
+    width: 170rpx;
+    border-radius: 14rpx;
+    margin-right: 20rpx;
+  }
 
-.detail .thumb--empty {
-  width: 170rpx;
-  height: 300rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #f1f1f1;
-}
+  .thumb--empty {
+    width: 170rpx;
+    height: 300rpx;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f1f1f1;
+  }
 
-.detail .time {
-  font-size: 26rpx;
-  color: var(--gray-text-color);
-}
-.detail .start {
-  padding: 8rpx 0;
-  font-size: 26rpx;
+  .time {
+    font-size: 26rpx;
+    color: var(--gray-text-color);
+  }
+  .start {
+    padding: 8rpx 0;
+    font-size: 26rpx;
+  }
 }
 .desc {
   padding: 10rpx 0;
+}
+
+.menu {
+  position: fixed;
+  left: v-bind(menuPositionX);
+  top: v-bind(menuPositionY);
+  z-index: 1000;
+
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+
+  min-width: 200rpx;
+  background: var(--menu-bg-color);
+  border-radius: 24rpx;
+  overflow: hidden;
+  &-item {
+    padding: 20rpx 40rpx 20rpx 30rpx;
+    &:not(:last-child) {
+      border-bottom: 2rpx solid var(--gray-divider-color);
+    }
+
+    &__text {
+      margin-left: 20rpx;
+    }
+
+    &--active {
+      background: var(--gray-bg-color);
+    }
+  }
 }
 </style>

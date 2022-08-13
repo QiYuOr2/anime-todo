@@ -22,7 +22,7 @@ const queryId = ref("");
 
 onShareAppMessage(() => ({
   title: `追番计划 | ${formattedAnime.value?.title}`,
-  path: setQueryString(Path.Detail, { id: formattedAnime.value!.id }),
+  path: setQueryString(Path.Detail, { id: formattedAnime.value!.id, willAdd: true }),
 }));
 onLoad((query) => {
   queryId.value = query.id || "";

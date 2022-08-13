@@ -12,7 +12,7 @@
 
 <center>
 <img src="https://gcore.jsdelivr.net/gh/qiyuor2/blog-image/img/20220814animetodo0.PNG" width="200" />
-<img src="https://gcore.jsdelivr.net/gh/qiyuor2/blog-image/img/20220814animetodo1.5.png" width="200" />
+<img src="https://gcore.jsdelivr.net/gh/qiyuor2/blog-image/img/20220814animetodo2.png" width="200" />
 </center>
 
 ## TODO

@@ -8,6 +8,12 @@
 
 本项目的所有用户数据均保存在本地，因此当进行更换设备、删除小程序等操作时需要在设置界面导出数据进行备份。
 
+## 使用预览
+
+<center>
+<img src="https://gcore.jsdelivr.net/gh/qiyuor2/blog-image/img/20220814animetodo0.PNG" width="200" />
+<img src="https://gcore.jsdelivr.net/gh/qiyuor2/blog-image/img/20220814animetodo1.PNG" width="200" />
+</center>
 
 ## TODO
 

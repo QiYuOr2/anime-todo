@@ -1,34 +1,35 @@
 {
   "pages": [
     {
-      "path": "modules/index/index",
+      "path": "pages/list/List",
       "style": {
         "navigationBarTitleText": "追番"
       }
     },
     {
-      "path": "modules/settings/index",
+      "path": "pages/settings/Settings",
       "style": {
         "navigationBarTitleText": "设置"
       }
     },
     {
-      "path": "modules/settings/about",
+      "path": "pages/settings/About",
       "style": {
         "navigationBarTitleText": "关于"
       }
     },
     {
-      "path": "modules/edit/index",
+      "path": "pages/list/Search",
       "style": {
         "navigationBarTitleText": "添加",
         "onReachBottomDistance": 10
       }
     },
     {
-      "path": "modules/edit/custom",
+      "path": "pages/list/Detail",
       "style": {
-        "navigationBarTitleText": "自定义"
+        "navigationBarTitleText": "详情",
+        "navigationStyle": "custom"
       }
     }
   ],
@@ -45,13 +46,13 @@
     "borderStyle": "black",
     "list": [
       {
-        "pagePath": "modules/index/index",
+        "pagePath": "pages/list/List",
         "iconPath": "static/icons/tv.png",
         "selectedIconPath": "static/icons/tv-green.png",
         "text": "追番"
       },
       {
-        "pagePath": "modules/settings/index",
+        "pagePath": "pages/settings/Settings",
         "iconPath": "static/icons/settings.png",
         "selectedIconPath": "static/icons/settings-green.png",
         "text": "设置"

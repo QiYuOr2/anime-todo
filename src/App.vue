@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { onLaunch, onShow, onHide } from "@dcloudio/uni-app";
-import { Local } from "./modules/common/local";
-
-wx.cloud.init();
+import { Local } from "./utils/local";
 
 onLaunch(() => {
   console.log("App Launch");
@@ -16,7 +14,7 @@ onHide(() => {
 });
 </script>
 <style>
-@import "./modules/common/styles/theme.css";
+@import "./styles/theme.css";
 
 .fixed-page {
   position: fixed;

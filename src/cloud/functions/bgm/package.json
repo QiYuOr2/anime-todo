@@ -1,8 +1,0 @@
-{
-  "name": "bgm",
-  "main": "index.js",
-  "dependencies": {
-    "axios": "^0.27.2",
-    "wx-server-sdk": "~2.6.1"
-  }
-}

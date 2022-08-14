@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { PropType } from "vue";
+import { PropType, ref } from "vue";
 import Tag from "@/components/Tag.vue";
 import XButton from "@/components/Button.vue";
 import XIcon from "@/components/Icon.vue";
@@ -30,11 +30,19 @@ const clickDetailHandler = () => {
 const longpressHandler = (event: Event) => {
   emit("longpress", { cur: props.info.cur, total: props.info.total, $event: event });
 };
+
+const imgVisible = ref(false);
+const imgLoaded = () => (imgVisible.value = true);
 </script>
 
 <template>
   <view class="anime-card" @click="clickDetailHandler" @longpress="longpressHandler">
-    <image v-if="info.img" class="thumb" :src="info.img" mode="aspectFill" />
+    <block v-if="info.img">
+      <image v-show="imgVisible" class="thumb" :src="info.img" mode="aspectFill" @load="imgLoaded" />
+      <view v-if="!imgVisible" class="thumb thumb--empty">
+        <x-icon name="picture" :size="40" />
+      </view>
+    </block>
     <view v-else class="thumb thumb--empty">
       <x-icon name="picture" :size="40" />
     </view>

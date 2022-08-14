@@ -1,7 +1,26 @@
+<script setup lang="ts">
+import { PropType, ref } from "vue";
+import XIcon from "@/components/Icon.vue";
+
+const { anime } = defineProps({
+  anime: {
+    type: Object as PropType<AnimeDTO>,
+  },
+});
+
+const imgVisible = ref(false);
+const imgLoaded = () => (imgVisible.value = true);
+</script>
+
 <template>
   <view class="anime-card">
     <view>
-      <image v-if="anime?.images?.common" class="thumb" :src="anime?.images?.common" mode="aspectFill" />
+      <block v-if="anime?.images?.common">
+        <image v-show="imgVisible" class="thumb" :src="anime?.images?.common" mode="aspectFill" @load="imgLoaded" />
+        <view v-if="!imgVisible" class="thumb thumb--empty">
+          <x-icon name="picture" :size="40" />
+        </view>
+      </block>
       <view v-else class="thumb thumb--empty">
         <x-icon name="picture" :size="40" />
       </view>
@@ -11,17 +30,6 @@
     </view>
   </view>
 </template>
-
-<script setup lang="ts">
-import { PropType } from "vue";
-import XIcon from "@/components/Icon.vue";
-
-const { anime } = defineProps({
-  anime: {
-    type: Object as PropType<AnimeDTO>,
-  },
-});
-</script>
 
 <style scoped>
 .anime-card {

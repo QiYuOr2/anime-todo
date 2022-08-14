@@ -12,6 +12,7 @@ import { Path } from "@/constants/path";
 import NavBar from "@/components/NavBar.vue";
 import Tag from "@/components/Tag.vue";
 import XButton from "@/components/Button.vue";
+import XIcon from "@/components/Icon.vue";
 
 const eventChannel = useEventChannel();
 const anime = ref<AnimeDTO>();
@@ -21,7 +22,7 @@ const isAddBtnVisible = ref(false);
 const queryId = ref("");
 
 onShareAppMessage(() => ({
-  title: `追番计划 | ${formattedAnime.value?.title}`,
+  title: `向你推荐 | ${formattedAnime.value?.title}`,
   path: setQueryString(Path.Detail, { id: formattedAnime.value!.id, willAdd: true }),
 }));
 onLoad((query) => {
@@ -70,7 +71,13 @@ const calcRatingCountHeight = (count: number, total: number) => {
 const addToList = () => {
   const fs = Local.create();
   const [, dataStr] = fs.read();
-  const data = JSON.parse(dataStr);
+
+  let data;
+  try {
+    data = JSON.parse(dataStr);
+  } catch (error) {
+    data = { list: [], finishList: [] };
+  }
 
   if (formattedAnime.value) {
     data.list.every((item: any) => item.title !== formattedAnime.value?.title) &&
@@ -84,13 +91,21 @@ const addToList = () => {
   fs.write(JSON.stringify(data));
   uni.switchTab({ url: Path.List });
 };
+
+const imgVisible = ref(false);
+const imgLoaded = () => (imgVisible.value = true);
 </script>
 
 <template>
   <nav-bar />
   <view class="detail" v-if="anime">
     <view class="thumb">
-      <image v-if="anime.images.large" class="thumb__img" :src="anime.images.large" mode="widthFix" />
+      <block v-if="anime.images.large">
+        <image v-show="imgVisible" class="thumb__img" :src="anime.images.large" mode="widthFix" @load="imgLoaded" />
+        <view v-if="!imgVisible" class="thumb__img thumb__img--empty">
+          <x-icon name="picture" :size="40" />
+        </view>
+      </block>
       <view v-else class="thumb__img thumb__img--empty">
         <x-icon name="picture" :size="40" />
       </view>
@@ -158,8 +173,7 @@ const addToList = () => {
   &__img {
     width: 100%;
     &--empty {
-      width: 170rpx;
-      height: 300rpx;
+      height: 70vh;
       display: flex;
       align-items: center;
       justify-content: center;

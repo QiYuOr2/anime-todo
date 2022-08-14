@@ -59,6 +59,14 @@ const copy = (text: string) => {
 
       <ul class="p">
         <li class="change-log">
+          <view>v1.3.1 [Bugfix]</view>
+          <view class="change-log__text">修复无数据时添加失败</view>
+        </li>
+        <li class="change-log">
+          <view>v1.3.0</view>
+          <view class="change-log__text">支持分享卡片一键添加追番</view>
+        </li>
+        <li class="change-log">
           <view>v1.2.0</view>
           <view class="change-log__text">[Break Change]数据新增了id字段</view>
           <view class="change-log__text change-log__text--not-list">详情数据可能出错，需要手动删除重新添加</view>

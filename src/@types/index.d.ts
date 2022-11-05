@@ -10,6 +10,11 @@ declare interface Anime {
   tags: string[];
 }
 
+declare interface LocalList {
+  list: Anime[];
+  finishList: Anime[];
+}
+
 declare interface AnimeDTO {
   air_date?: string;
   date?: string;

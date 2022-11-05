@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import pkg from "../../../package.json";
 const from = "https://github.com/bangumi/api/";
 const opensource = "https://github.com/QiYuOr2/anime-todo";
 const mail = "qiyuor2@foxmail.com";
@@ -29,11 +30,13 @@ const copy = (text: string) => {
     </view>
     <view class="content">
       <view class="title">
-        <text>追番列表</text>
-        <text class="version">v1.1.0</text>
+        <text>{{ pkg.displayName }}</text>
+        <text class="version">v{{ pkg.version }}</text>
       </view>
       <view class="p"> 追番列表是一个用来记录个人动画观看情况的小程序。 </view>
-      <view class="p"> 本项目的所有用户数据均保存在本地，因此当进行更换设备、删除小程序等操作时需要在设置界面导出数据进行备份。 </view>
+      <view class="p">
+        本项目的所有用户数据均保存在本地，因此当进行更换设备、删除小程序等操作时需要在设置界面导出数据进行备份。
+      </view>
 
       <view class="divider"></view>
 
@@ -69,7 +72,9 @@ const copy = (text: string) => {
         <li class="change-log">
           <view>v1.2.0</view>
           <view class="change-log__text">[Break Change]数据新增了id字段</view>
-          <view class="change-log__text change-log__text--not-list">详情数据可能出错，需要手动删除重新添加</view>
+          <view class="change-log__text change-log__text--not-list"
+            >详情数据可能出错，需要手动删除重新添加</view
+          >
           <view class="change-log__text">详情从弹窗改为页面</view>
         </li>
         <li class="change-log">

@@ -45,3 +45,25 @@ export function animeDetailFormatter(anime: any, preview: any) {
     tags,
   };
 }
+
+/**
+ * 简化 switch case \
+ * 如果values中匹配不到条件或是匹配到的值为undefined，则会返回default的值
+ * @param condition 条件
+ * @param values 返回值
+ *
+ *
+ * ```js
+ * const result = switchValue(enum, {
+ *   [enum.A]: valueOfA,
+ *   [enum.B]: valueOfB,
+ *   default: valueOfDefault
+ * })
+ * ```
+ */
+export function switchValue<K extends string | number | symbol, R>(condition: K | (() => K), values: Record<K, R> & { default?: R }) {
+  if (typeof condition === "function") {
+    return values[condition()] ?? values.default;
+  }
+  return values[condition] ?? values.default;
+}

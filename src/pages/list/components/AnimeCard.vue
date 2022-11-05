@@ -12,23 +12,23 @@ const props = defineProps({
 
 const emit = defineEmits<{
   (event: "single"): void;
-  (event: "more", value: { cur: number | string; total: number | string; $event: Event }): void;
+  (event: "more", $event: Event): void;
   (event: "detail", value: Anime): void;
-  (event: "longpress", value: { cur: number | string; total: number | string; $event: Event }): void;
+  (event: "longpress", $event: TouchEvent): void;
 }>();
 
 const clickOneHandler = () => {
   emit("single");
 };
 const clickMoreHandler = (event: Event) => {
-  emit("more", { cur: props.info.cur, total: props.info.total, $event: event });
+  emit("more", event);
 };
 const clickDetailHandler = () => {
   emit("detail", props.info);
 };
 
 const longpressHandler = (event: Event) => {
-  emit("longpress", { cur: props.info.cur, total: props.info.total, $event: event });
+  emit("longpress", event as TouchEvent);
 };
 
 const imgVisible = ref(false);

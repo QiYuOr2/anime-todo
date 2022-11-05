@@ -11,38 +11,39 @@ import TabBar from "./components/TabBar.vue";
 import Modal from "@/components/Modal.vue";
 import XButton from "@/components/Button.vue";
 import XIcon from "@/components/Icon.vue";
+import { AnimeLocalSource, useAnimeList } from "@/composables";
 
 onShareAppMessage(() => ({ title: "追番计划" }));
-const list = ref<Anime[]>([]);
 
-const finishList = ref<Anime[]>([]);
-
-const writeToLocal = () => {
-  Local.create().write(
-    JSON.stringify({
-      list: list.value,
-      finishList: finishList.value,
-    })
-  );
+const Tabs = {
+  Doing: 0,
+  Done: 1,
 };
-
-onShow(() => {
-  const fs = Local.create();
-  const [err, data] = fs.read();
-  if (err) {
-    // uni.showToast({ icon: 'none', title: '数据读取错误' });
-    return;
-  }
-  const dataStr = JSON.parse(data);
-  list.value = dataStr.list;
-  finishList.value = dataStr.finishList;
-});
-
-const currentTab = ref(0);
 const tabs = ["观看中", "已看完"];
+const currentTab = ref(0);
 const toAdd = () => {
   uni.navigateTo({ url: Path.Search });
 };
+
+const { value: doingAnimes, ...doingAnimesActions } = useAnimeList(AnimeLocalSource.Doing);
+const { value: doneAnimes, ...doneAnimesActions } = useAnimeList(AnimeLocalSource.Done);
+
+const actions = () => (currentTab.value === Tabs.Doing ? doingAnimesActions : doneAnimesActions);
+
+// const list = ref<Anime[]>([]);
+
+// const finishList = ref<Anime[]>([]);
+
+// const writeToLocal = () => {
+//   Local.create().write(
+//     JSON.stringify({
+//       list: list.value,
+//       finishList: finishList.value,
+//     })
+//   );
+// };
+
+const selectedId = ref(-1);
 
 const isMenuVisible = ref(false);
 
@@ -53,18 +54,10 @@ const indexScrollHandler = () => {
 const menuPositionX = ref("0");
 const menuPositionY = ref("0");
 
-const awakeMenuHandler = (values: { cur: string | number; total: string | number; $event: any }, index: number) => {
+const awakeMenuHandler = (event: TouchEvent) => {
   uni.vibrateShort({});
 
-  currentEditIndex.value = index;
-  currentEditCur.value = Number(values.cur);
-  totalNum.value = Number(values.total);
-
-  if (!values.$event) {
-    return;
-  }
-
-  const touched = values.$event.changedTouches[0];
+  const touched = event.changedTouches[0];
 
   // 防止菜单超出边界
   let x = touched.clientX;
@@ -84,14 +77,12 @@ const clickIndexHandler = () => {
 
 const remove = () => {
   uni.vibrateShort({});
-  const source = get(list);
   uni.showModal({
     title: "警告",
     content: "确定要删除该记录吗？",
     success(res) {
       if (res.confirm) {
-        set(list, removeOne(source, currentEditIndex.value));
-        writeToLocal();
+        actions().remove(selectedId.value);
       } else if (res.cancel) {
         console.log("取消删除");
       }
@@ -101,60 +92,54 @@ const remove = () => {
 
 //#region 修改已看级数
 const addOne = (index: number) => {
-  const source = list.value;
-
-  source[index].cur = source[index].cur + 1;
-  const cur = source[index].cur;
-
-  if (cur === source[index].total) {
-    const currentItem = source[index];
-
-    uni.showToast({ title: "看完这部番啦！", icon: "none" });
-
-    list.value = source.filter((_, i) => i !== index);
-    finishList.value = [...finishList.value, currentItem];
-
-    writeToLocal();
-    return;
-  }
-  list.value = source;
-  writeToLocal();
+  // const source = list.value;
+  // source[index].cur = source[index].cur + 1;
+  // const cur = source[index].cur;
+  // if (cur === source[index].total) {
+  //   const currentItem = source[index];
+  //   uni.showToast({ title: "看完这部番啦！", icon: "none" });
+  //   list.value = source.filter((_, i) => i !== index);
+  //   finishList.value = [...finishList.value, currentItem];
+  //   writeToLocal();
+  //   return;
+  // }
+  // list.value = source;
+  // writeToLocal();
 };
 
 const addModealVisible = ref(false);
 const totalNum = ref(0);
 const currentEditIndex = ref(0);
-const currentEditCur = ref(0);
+const currentEpisode = ref(0);
 
-const clickMore = (values: { cur: string | number; total: string | number; $event: Event }, index: number) => {
-  awakeMenuHandler(values, index);
+const clickMoreHandler = (event: Event, id: number) => {
+  selectedId.value = id;
+  const { total, cur } = actions().getOne(selectedId.value);
+  totalNum.value = total;
+  currentEpisode.value = cur;
+  awakeMenuHandler(event as TouchEvent);
 };
+
 const addMore = () => {
   uni.vibrateShort({});
   isMenuVisible.value = false;
   addModealVisible.value = true;
 };
 const selectNumHandler = (num: number) => {
-  addModealVisible.value = false;
-
-  const source = list.value;
-  source[currentEditIndex.value].cur = num;
-
-  const cur = source[currentEditIndex.value].cur;
-
-  if (cur === source[currentEditIndex.value].total) {
-    const currentItem = source[currentEditIndex.value];
-
-    uni.showToast({ title: "看完这部番啦！", icon: "none" });
-
-    list.value = source.filter((_, i) => i !== currentEditIndex.value);
-    finishList.value = [...finishList.value, currentItem];
-
-    writeToLocal();
-    return;
-  }
-  list.value = source;
-  writeToLocal();
+  // addModealVisible.value = false;
+  // const source = list.value;
+  // source[currentEditIndex.value].cur = num;
+  // const cur = source[currentEditIndex.value].cur;
+  // if (cur === source[currentEditIndex.value].total) {
+  //   const currentItem = source[currentEditIndex.value];
+  //   uni.showToast({ title: "看完这部番啦！", icon: "none" });
+  //   list.value = source.filter((_, i) => i !== currentEditIndex.value);
+  //   finishList.value = [...finishList.value, currentItem];
+  //   writeToLocal();
+  //   return;
+  // }
+  // list.value = source;
+  // writeToLocal();
 };
 //#endregion
 
@@ -177,23 +162,23 @@ const toDetail = (detail: Anime) => {
       </view>
     </view>
 
-    <view v-if="currentTab === 0" class="list">
-      <view v-if="list.length === 0" class="empty">还没有正在看的番剧哦~</view>
-      <view class="item" v-for="(item, i) in list" :key="i">
+    <view v-if="currentTab === Tabs.Doing" class="list">
+      <view v-if="doingAnimes.length === 0" class="empty">还没有正在看的番剧哦~</view>
+      <view class="item" v-for="(item, i) in doingAnimes" :key="i">
         <anime-card
           :info="item"
           @single="addOne(i)"
-          @more="clickMore($event, i)"
+          @more="clickMoreHandler($event, item.id)"
           @detail="toDetail(item)"
-          @longpress="awakeMenuHandler($event, i)"
+          @longpress="awakeMenuHandler"
         />
       </view>
     </view>
-    <view v-if="currentTab === 1" class="list">
-      <view v-if="finishList.length === 0" class="empty"> 还没有已经看完的番剧哦~ </view>
+    <view v-if="currentTab === Tabs.Done" class="list">
+      <view v-if="doneAnimes.length === 0" class="empty"> 还没有已经看完的番剧哦~ </view>
       <block v-else>
-        <view class="tips">共记录了 {{ finishList.length }} 部已看完的动画</view>
-        <view class="item" v-for="(item, i) in finishList" :key="i">
+        <view class="tips">共记录了 {{ doneAnimes.length }} 部已看完的动画</view>
+        <view class="item" v-for="(item, i) in doneAnimes" :key="i">
           <anime-card :info="item" @detail="toDetail(item)" hideActions />
         </view>
       </block>
@@ -212,7 +197,7 @@ const toDetail = (detail: Anime) => {
 
     <modal v-model:visible="addModealVisible" title="选择集数">
       <view class="modal-content">
-        <x-button custom-class="select-button" v-for="i in totalNum" :key="i" @click="selectNumHandler(i)" :plain="currentEditCur < i">
+        <x-button custom-class="select-button" v-for="i in totalNum" :key="i" @click="selectNumHandler(i)" :plain="currentEpisode < i">
           {{ i }}
         </x-button>
       </view>

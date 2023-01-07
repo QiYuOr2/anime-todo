@@ -82,6 +82,7 @@ const imgLoaded = () => (imgVisible.value = true);
   padding: 20rpx;
   border-radius: 36rpx;
   box-shadow: 0 0rpx 32rpx 5rpx rgba(0, 0, 0, 0.06);
+  background: #fff;
   .thumb {
     min-width: 140rpx;
     width: 140rpx;

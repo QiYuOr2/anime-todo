@@ -42,6 +42,19 @@ export function useAnimeList(source: AnimeLocalSource) {
         return item;
       })
     );
+    save();
+  };
+
+  const modifyProgress = (id: number, progress: number, type: "add" | "modify" = "add") => {
+    const anime = getOne(id);
+    if (type === "add") {
+      anime.cur = anime.cur + progress;
+    } else {
+      anime.cur = progress;
+    }
+    modify(id, anime);
+
+    return anime;
   };
 
   const remove = (id: number) => {
@@ -49,6 +62,8 @@ export function useAnimeList(source: AnimeLocalSource) {
       list,
       get(list).filter((item) => item.id !== id)
     );
+
+    save();
   };
 
   const save = () => {
@@ -66,5 +81,13 @@ export function useAnimeList(source: AnimeLocalSource) {
     return get(list).filter((item) => item.id === id)?.[0];
   };
 
-  return { value: list, modify, save, remove, getOne };
+  const add = (anime: Anime) => {
+    const oldList = list.value.slice(0);
+    oldList.push(anime);
+    list.value = oldList;
+
+    save();
+  };
+
+  return { value: list, add, modify, save, remove, getOne, modifyProgress };
 }

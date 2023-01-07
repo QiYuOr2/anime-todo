@@ -30,53 +30,34 @@ const { value: doneAnimes, ...doneAnimesActions } = useAnimeList(AnimeLocalSourc
 
 const actions = () => (currentTab.value === Tabs.Doing ? doingAnimesActions : doneAnimesActions);
 
-// const list = ref<Anime[]>([]);
-
-// const finishList = ref<Anime[]>([]);
-
-// const writeToLocal = () => {
-//   Local.create().write(
-//     JSON.stringify({
-//       list: list.value,
-//       finishList: finishList.value,
-//     })
-//   );
-// };
-
 const selectedId = ref(-1);
 
-const isMenuVisible = ref(false);
-
-const indexScrollHandler = () => {
-  isMenuVisible.value = false;
-};
-
-const menuPositionX = ref("0");
-const menuPositionY = ref("0");
-
-const awakeMenuHandler = (event: TouchEvent) => {
+const awakeMenuHandler = (event: TouchEvent, item: Anime) => {
   uni.vibrateShort({});
 
-  const touched = event.changedTouches[0];
-
-  // 防止菜单超出边界
-  let x = touched.clientX;
-  let y = touched.clientY;
-  if (x + 100 > 375) {
-    x -= 100;
-  }
-
-  menuPositionX.value = `${x}px`;
-  menuPositionY.value = `${y}px`;
-  isMenuVisible.value = true;
-};
-
-const clickIndexHandler = () => {
-  isMenuVisible.value = false;
+  uni.showActionSheet({
+    itemList: ["移至顶部", "查看详情", "修改进度", "删除"],
+    success({ tapIndex }) {
+      switch (tapIndex) {
+        case 0:
+          break;
+        case 1:
+          toDetail(item);
+          break;
+        case 2:
+          break;
+        case 3:
+          remove();
+          break;
+      }
+    },
+    fail() {
+      console.log("cancel");
+    },
+  });
 };
 
 const remove = () => {
-  uni.vibrateShort({});
   uni.showModal({
     title: "警告",
     content: "确定要删除该记录吗？",
@@ -91,42 +72,32 @@ const remove = () => {
 };
 
 //#region 修改已看级数
-const addOne = (index: number) => {
-  // const source = list.value;
-  // source[index].cur = source[index].cur + 1;
-  // const cur = source[index].cur;
-  // if (cur === source[index].total) {
-  //   const currentItem = source[index];
-  //   uni.showToast({ title: "看完这部番啦！", icon: "none" });
-  //   list.value = source.filter((_, i) => i !== index);
-  //   finishList.value = [...finishList.value, currentItem];
-  //   writeToLocal();
-  //   return;
-  // }
-  // list.value = source;
-  // writeToLocal();
+const addOne = (item: Anime) => {
+  const modified = actions().modifyProgress(item.id, 1);
+
+  if (modified.cur === modified.total) {
+    uni.showToast({ title: "看完这部番啦！", icon: "none" });
+
+    doingAnimesActions.remove(modified.id);
+    doneAnimesActions.add(modified);
+  }
 };
 
-const addModealVisible = ref(false);
+const addModalVisible = ref(false);
 const totalNum = ref(0);
 const currentEditIndex = ref(0);
 const currentEpisode = ref(0);
 
-const clickMoreHandler = (event: Event, id: number) => {
-  selectedId.value = id;
+const clickMoreHandler = (event: Event, item: Anime) => {
+  selectedId.value = item.id;
   const { total, cur } = actions().getOne(selectedId.value);
   totalNum.value = total;
   currentEpisode.value = cur;
-  awakeMenuHandler(event as TouchEvent);
+  awakeMenuHandler(event as TouchEvent, item);
 };
 
-const addMore = () => {
-  uni.vibrateShort({});
-  isMenuVisible.value = false;
-  addModealVisible.value = true;
-};
 const selectNumHandler = (num: number) => {
-  // addModealVisible.value = false;
+  // addModalVisible.value = false;
   // const source = list.value;
   // source[currentEditIndex.value].cur = num;
   // const cur = source[currentEditIndex.value].cur;
@@ -154,7 +125,7 @@ const toDetail = (detail: Anime) => {
 </script>
 
 <template>
-  <view class="index fixed-page" @click="clickIndexHandler" @touchmove="indexScrollHandler">
+  <view class="index fixed-page">
     <view class="index__header">
       <tab-bar v-model:current="currentTab" :tabs="tabs" />
       <view class="plus-icon" @click="toAdd">
@@ -167,10 +138,10 @@ const toDetail = (detail: Anime) => {
       <view class="item" v-for="(item, i) in doingAnimes" :key="i">
         <anime-card
           :info="item"
-          @single="addOne(i)"
-          @more="clickMoreHandler($event, item.id)"
+          @single="addOne(item)"
+          @more="clickMoreHandler($event, item)"
           @detail="toDetail(item)"
-          @longpress="awakeMenuHandler"
+          @longpress="awakeMenuHandler($event, item)"
         />
       </view>
     </view>
@@ -184,18 +155,7 @@ const toDetail = (detail: Anime) => {
       </block>
     </view>
 
-    <view class="menu" v-if="isMenuVisible">
-      <view class="menu-item" hover-class="menu-item--active" @click="remove">
-        <x-icon name="ashbin" :size="32" />
-        <text class="menu-item__text">删除</text>
-      </view>
-      <view class="menu-item" hover-class="menu-item--active" @click="addMore">
-        <x-icon name="modular" :size="32" />
-        <text class="menu-item__text">进度</text>
-      </view>
-    </view>
-
-    <modal v-model:visible="addModealVisible" title="选择集数">
+    <modal v-model:visible="addModalVisible" title="选择集数">
       <view class="modal-content">
         <x-button custom-class="select-button" v-for="i in totalNum" :key="i" @click="selectNumHandler(i)" :plain="currentEpisode < i">
           {{ i }}
@@ -229,6 +189,7 @@ const toDetail = (detail: Anime) => {
   &__header .plus-icon {
     padding: 10rpx;
   }
+
   .item {
     margin-bottom: 1rem;
   }
@@ -277,35 +238,5 @@ const toDetail = (detail: Anime) => {
 
 .desc {
   padding: 10rpx 0;
-}
-
-.menu {
-  position: fixed;
-  left: v-bind(menuPositionX);
-  top: v-bind(menuPositionY);
-  z-index: 1000;
-
-  display: flex;
-  justify-content: center;
-  flex-direction: column;
-
-  min-width: 200rpx;
-  background: var(--menu-bg-color);
-  border-radius: 24rpx;
-  overflow: hidden;
-  &-item {
-    padding: 20rpx 40rpx 20rpx 30rpx;
-    &:not(:last-child) {
-      border-bottom: 2rpx solid var(--gray-divider-color);
-    }
-
-    &__text {
-      margin-left: 20rpx;
-    }
-
-    &--active {
-      background: var(--gray-bg-color);
-    }
-  }
 }
 </style>

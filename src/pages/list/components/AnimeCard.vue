@@ -36,7 +36,7 @@ const imgLoaded = () => (imgVisible.value = true);
 </script>
 
 <template>
-  <view class="anime-card" @click="clickDetailHandler" @longpress="longpressHandler">
+  <view class="anime-card" @click="clickDetailHandler" @longpress.stop="longpressHandler">
     <block v-if="info.img">
       <image v-show="imgVisible" class="thumb" :src="info.img" mode="aspectFill" @load="imgLoaded" />
       <view v-if="!imgVisible" class="thumb thumb--empty">

@@ -30,6 +30,7 @@ export function useAnimeList(source: AnimeLocalSource) {
         [AnimeLocalSource.Done]: localList.finishList,
       })
     );
+    console.log(list.value);
   });
 
   const modify = (id: number, anime: Anime | ((prev: Anime) => Anime)) => {
@@ -89,5 +90,11 @@ export function useAnimeList(source: AnimeLocalSource) {
     save();
   };
 
-  return { value: list, add, modify, save, remove, getOne, modifyProgress };
+  const moveToTop = (id: number) => {
+    const item = getOne(id);
+    remove(id);
+    add(item);
+  };
+
+  return { value: list, add, modify, save, remove, getOne, modifyProgress, moveToTop };
 }

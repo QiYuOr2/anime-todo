@@ -1,19 +1,18 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import { onShow, onShareAppMessage } from "@dcloudio/uni-app";
-import { get, set } from "@vueuse/core";
-import { removeOne, Local } from "@/utils";
+import { onShareAppMessage } from "@dcloudio/uni-app";
 import { Path } from "@/constants/path";
 import { EventName } from "@/constants/event";
 
 import AnimeCard from "./components/AnimeCard.vue";
 import TabBar from "./components/TabBar.vue";
-import Modal from "@/components/Modal.vue";
-import XButton from "@/components/Button.vue";
 import XIcon from "@/components/Icon.vue";
 import { AnimeLocalSource, useAnimeList } from "@/composables";
+import { useToggle } from "@vueuse/core";
 
 onShareAppMessage(() => ({ title: "追番计划" }));
+
+const [modifyVisible, toggleModifyVisible] = useToggle(false)
 
 const Tabs = {
   Doing: 0,
@@ -33,13 +32,14 @@ const actions = () => (currentTab.value === Tabs.Doing ? doingAnimesActions : do
 const selectedId = ref(-1);
 
 const awakeMenuHandler = (event: TouchEvent, item: Anime) => {
-  uni.vibrateShort({});
+  wx.vibrateShort({ type: "heavy" });
 
   uni.showActionSheet({
     itemList: ["移至顶部", "查看详情", "修改进度", "删除"],
     success({ tapIndex }) {
       switch (tapIndex) {
         case 0:
+          actions().moveToTop(item.id);
           break;
         case 1:
           toDetail(item);
@@ -122,6 +122,10 @@ const toDetail = (detail: Anime) => {
     },
   });
 };
+
+const reverse = <T>(list: T[]) => {
+  return list.slice().reverse();
+};
 </script>
 
 <template>
@@ -135,7 +139,7 @@ const toDetail = (detail: Anime) => {
 
     <view v-if="currentTab === Tabs.Doing" class="list">
       <view v-if="doingAnimes.length === 0" class="empty">还没有正在看的番剧哦~</view>
-      <view class="item" v-for="(item, i) in doingAnimes" :key="i">
+      <view class="item" v-for="(item, i) in reverse(doingAnimes)" :key="i">
         <anime-card
           :info="item"
           @single="addOne(item)"
@@ -146,22 +150,16 @@ const toDetail = (detail: Anime) => {
       </view>
     </view>
     <view v-if="currentTab === Tabs.Done" class="list">
-      <view v-if="doneAnimes.length === 0" class="empty"> 还没有已经看完的番剧哦~ </view>
+      <view v-if="doneAnimes.length === 0" class="empty">还没有已经看完的番剧哦~</view>
       <block v-else>
         <view class="tips">共记录了 {{ doneAnimes.length }} 部已看完的动画</view>
-        <view class="item" v-for="(item, i) in doneAnimes" :key="i">
+        <view class="item" v-for="(item, i) in reverse(doneAnimes)" :key="i">
           <anime-card :info="item" @detail="toDetail(item)" hideActions />
         </view>
       </block>
     </view>
 
-    <modal v-model:visible="addModalVisible" title="选择集数">
-      <view class="modal-content">
-        <x-button custom-class="select-button" v-for="i in totalNum" :key="i" @click="selectNumHandler(i)" :plain="currentEpisode < i">
-          {{ i }}
-        </x-button>
-      </view>
-    </modal>
+    <!-- <van-popup :show="modifyVisible">123</van-popup> -->
   </view>
 </template>
 

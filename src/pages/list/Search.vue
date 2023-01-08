@@ -66,8 +66,8 @@ const toDetail = (id: number) =>
 </script>
 
 <template>
-  <view class="search" @click="inputFocus">
-    <input ref="searchInput" v-model="keyword" placeholder="搜索番剧" />
+  <view class="search" @click.stop.prevent="inputFocus">
+    <input class="text-center" ref="searchInput" v-model="keyword" placeholder="搜索番剧" />
   </view>
   <view class="list">
     <view class="title">
@@ -95,7 +95,7 @@ const toDetail = (id: number) =>
 .search {
   padding: 10rpx 14rpx;
   input {
-    padding: 10rpx 32rpx;
+    padding: 14rpx 32rpx;
     margin: 14rpx 0 20rpx;
     border-radius: 100rpx;
     background: var(--gray-bg-color);
@@ -165,5 +165,9 @@ const toDetail = (id: number) =>
 }
 .desc {
   padding: 10rpx 0;
+}
+
+.text-center {
+  text-align: center;
 }
 </style>

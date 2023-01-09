@@ -24,7 +24,7 @@ const copy = (text: string) => {
 </script>
 
 <template>
-  <view class="about fixed-page">
+  <view class="about">
     <view class="logo">
       <image src="../../static/logo.png" mode="widthFix" />
     </view>

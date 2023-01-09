@@ -1,18 +1,30 @@
 <script setup lang="ts">
-import { ref } from "vue";
-import { onShareAppMessage } from "@dcloudio/uni-app";
+import { ref, watchEffect } from "vue";
+import { onPageScroll, onShareAppMessage } from "@dcloudio/uni-app";
 import { Path } from "@/constants/path";
 import { EventName } from "@/constants/event";
+import { AnimeLocalSource, useAnimeList } from "@/composables";
+import { useToggle } from "@vueuse/core";
 
 import AnimeCard from "./components/AnimeCard.vue";
 import TabBar from "./components/TabBar.vue";
 import XIcon from "@/components/Icon.vue";
-import { AnimeLocalSource, useAnimeList } from "@/composables";
-import { useToggle } from "@vueuse/core";
+import XButton from "@/components/Button.vue";
+import Popup from "@/components/Popup.vue";
+import ToTop from "@/components/ToTop.vue";
 
 onShareAppMessage(() => ({ title: "追番计划" }));
 
-const [modifyVisible, toggleModifyVisible] = useToggle(false)
+const [toTopVisible, toggleToTopVisible] = useToggle(false);
+onPageScroll(({ scrollTop }) => {
+  toggleToTopVisible(scrollTop > 50);
+});
+
+const [modifyVisible, toggleModifyVisible] = useToggle(false);
+
+watchEffect(() => {
+  modifyVisible.value ? uni.hideTabBar() : uni.showTabBar();
+});
 
 const Tabs = {
   Doing: 0,
@@ -29,8 +41,6 @@ const { value: doneAnimes, ...doneAnimesActions } = useAnimeList(AnimeLocalSourc
 
 const actions = () => (currentTab.value === Tabs.Doing ? doingAnimesActions : doneAnimesActions);
 
-const selectedId = ref(-1);
-
 const awakeMenuHandler = (event: TouchEvent, item: Anime) => {
   wx.vibrateShort({ type: "heavy" });
 
@@ -45,9 +55,10 @@ const awakeMenuHandler = (event: TouchEvent, item: Anime) => {
           toDetail(item);
           break;
         case 2:
+          toggleModifyVisible(true);
           break;
         case 3:
-          remove();
+          remove(item.id);
           break;
       }
     },
@@ -57,13 +68,13 @@ const awakeMenuHandler = (event: TouchEvent, item: Anime) => {
   });
 };
 
-const remove = () => {
+const remove = (id: number) => {
   uni.showModal({
     title: "警告",
     content: "确定要删除该记录吗？",
     success(res) {
       if (res.confirm) {
-        actions().remove(selectedId.value);
+        actions().remove(id);
       } else if (res.cancel) {
         console.log("取消删除");
       }
@@ -83,34 +94,23 @@ const addOne = (item: Anime) => {
   }
 };
 
-const addModalVisible = ref(false);
-const totalNum = ref(0);
-const currentEditIndex = ref(0);
-const currentEpisode = ref(0);
+const selectedItem = ref<Anime>();
 
 const clickMoreHandler = (event: Event, item: Anime) => {
-  selectedId.value = item.id;
-  const { total, cur } = actions().getOne(selectedId.value);
-  totalNum.value = total;
-  currentEpisode.value = cur;
+  selectedItem.value = actions().getOne(item.id);
   awakeMenuHandler(event as TouchEvent, item);
 };
 
 const selectNumHandler = (num: number) => {
-  // addModalVisible.value = false;
-  // const source = list.value;
-  // source[currentEditIndex.value].cur = num;
-  // const cur = source[currentEditIndex.value].cur;
-  // if (cur === source[currentEditIndex.value].total) {
-  //   const currentItem = source[currentEditIndex.value];
-  //   uni.showToast({ title: "看完这部番啦！", icon: "none" });
-  //   list.value = source.filter((_, i) => i !== currentEditIndex.value);
-  //   finishList.value = [...finishList.value, currentItem];
-  //   writeToLocal();
-  //   return;
-  // }
-  // list.value = source;
-  // writeToLocal();
+  toggleModifyVisible(false);
+  const modified = actions().modifyProgress(selectedItem.value!.id, num, "modify");
+
+  if (modified.cur === modified.total) {
+    uni.showToast({ title: "看完这部番啦！", icon: "none" });
+
+    doingAnimesActions.remove(modified.id);
+    doneAnimesActions.add(modified);
+  }
 };
 //#endregion
 
@@ -129,7 +129,7 @@ const reverse = <T>(list: T[]) => {
 </script>
 
 <template>
-  <view class="index fixed-page">
+  <view class="index">
     <view class="index__header">
       <tab-bar v-model:current="currentTab" :tabs="tabs" />
       <view class="plus-icon" @click="toAdd">
@@ -137,7 +137,7 @@ const reverse = <T>(list: T[]) => {
       </view>
     </view>
 
-    <view v-if="currentTab === Tabs.Doing" class="list">
+    <view v-show="currentTab === Tabs.Doing" class="list">
       <view v-if="doingAnimes.length === 0" class="empty">还没有正在看的番剧哦~</view>
       <view class="item" v-for="(item, i) in reverse(doingAnimes)" :key="i">
         <anime-card
@@ -145,11 +145,12 @@ const reverse = <T>(list: T[]) => {
           @single="addOne(item)"
           @more="clickMoreHandler($event, item)"
           @detail="toDetail(item)"
-          @longpress="awakeMenuHandler($event, item)"
+          @longpress="clickMoreHandler($event, item)"
         />
       </view>
     </view>
-    <view v-if="currentTab === Tabs.Done" class="list">
+
+    <view v-show="currentTab === Tabs.Done" class="list">
       <view v-if="doneAnimes.length === 0" class="empty">还没有已经看完的番剧哦~</view>
       <block v-else>
         <view class="tips">共记录了 {{ doneAnimes.length }} 部已看完的动画</view>
@@ -159,14 +160,33 @@ const reverse = <T>(list: T[]) => {
       </block>
     </view>
 
-    <!-- <van-popup :show="modifyVisible">123</van-popup> -->
+    <to-top v-if="toTopVisible" />
+
+    <popup v-model:visible="modifyVisible">
+      <view class="progress-edit" v-if="selectedItem?.id">
+        <view class="progress-edit__title">{{ selectedItem!.title }}进度修改</view>
+        <view class="progress-edit__content">
+          <x-button custom-class="select-button" @click="selectNumHandler(0)">未开始</x-button>
+          <x-button
+            custom-class="select-button"
+            v-for="i in selectedItem!.total"
+            :key="i"
+            @click="selectNumHandler(i)"
+            :plain="selectedItem!.cur < i"
+          >
+            {{ i }}
+          </x-button>
+        </view>
+      </view>
+    </popup>
   </view>
 </template>
 
-<style>
+<style lang="scss">
 .select-button {
-  min-width: 50rpx;
-  margin: 10rpx;
+  min-width: 80rpx;
+  padding-top: 16rpx !important;
+  padding-bottom: 16rpx !important;
   text-align: center;
 }
 </style>
@@ -223,18 +243,34 @@ const reverse = <T>(list: T[]) => {
   margin-right: 30rpx;
 }
 
-.modal-content {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-wrap: wrap;
-
-  max-height: 600rpx;
-  margin-top: 20rpx;
-  overflow-y: auto;
-}
-
 .desc {
   padding: 10rpx 0;
+}
+
+.progress-edit {
+  padding-bottom: constant(safe-area-inset-bottom);
+  padding-bottom: env(safe-area-inset-bottom);
+
+  &__title {
+    padding: 22rpx 32rpx 0;
+    font-weight: bold;
+  }
+
+  &__content {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+
+    max-height: 600rpx;
+    overflow-y: auto;
+
+    padding: 16rpx 32rpx;
+
+    x-button {
+      padding: 10rpx;
+      // &:last-child {
+      //   margin-right: auto;
+      // }
+    }
+  }
 }
 </style>

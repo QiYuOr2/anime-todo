@@ -47,7 +47,6 @@
     "@dcloudio/uni-mp-weixin": "^3.0.0-alpha-3040220220310005",
     "@dcloudio/uni-quickapp-webview": "^3.0.0-alpha-3040220220310005",
     "@vueuse/core": "^8.5.0",
-    "vant": "^4.0.7",
     "vue": "^3.2.31",
     "vue-i18n": "^9.1.9",
     "vuex": "^4.0.2"

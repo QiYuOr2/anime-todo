@@ -23,7 +23,7 @@ const emit = defineEmits<{
 }>();
 
 const clickHanlder = (event: Event) => {
-  uni.vibrateShort({});
+  wx.vibrateShort({ type: "heavy" });
   emit("click", event);
 };
 </script>

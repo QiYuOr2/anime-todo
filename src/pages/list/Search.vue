@@ -2,7 +2,7 @@
 import { onMounted, ref } from "vue";
 import { onReachBottom } from "@dcloudio/uni-app";
 
-import { watchDebounced } from "@vueuse/core";
+import { useToggle, watchDebounced } from "@vueuse/core";
 
 import { calendar, search } from "@/apis/bangumi";
 
@@ -54,10 +54,7 @@ onMounted(() => {
   getCalendar();
 });
 
-const inputRef = ref<HTMLElement | null>(null);
-const inputFocus = () => {
-  inputRef.value?.focus();
-};
+const [isFocus, toggleIsFocus] = useToggle(false);
 
 const toDetail = (id: number) =>
   uni.navigateTo({
@@ -66,8 +63,16 @@ const toDetail = (id: number) =>
 </script>
 
 <template>
-  <view class="search" @click.stop.prevent="inputFocus">
-    <input class="text-center" ref="searchInput" v-model="keyword" placeholder="搜索番剧" />
+  <view class="search" @click="toggleIsFocus(true)">
+    <input
+      type="text"
+      class="text-center"
+      v-model="keyword"
+      placeholder="搜索番剧"
+      confirm-type="search"
+      :focus="isFocus"
+      @blur="toggleIsFocus(false)"
+    />
   </view>
   <view class="list">
     <view class="title">
@@ -94,6 +99,7 @@ const toDetail = (id: number) =>
 <style scoped lang="scss">
 .search {
   padding: 10rpx 14rpx;
+
   input {
     padding: 14rpx 32rpx;
     margin: 14rpx 0 20rpx;
@@ -131,7 +137,11 @@ const toDetail = (id: number) =>
   font-size: 34rpx;
   color: var(--gray-text-color);
   padding: 10rpx 0;
+  margin-bottom: 10px;
   text-align: center;
+
+  padding-bottom: constant(safe-area-inset-bottom);
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
 .detail {

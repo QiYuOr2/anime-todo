@@ -60,12 +60,17 @@ const copy = (text: string) => {
 
       <ul class="p">
         <li class="change-log">
+          <view>v1.4.1</view>
+          <view class="change-log__text">修复层级错误</view>
+          <view class="change-log__text">修复弹窗无法滚动的问题</view>
+        </li>
+        <li class="change-log">
           <view>v1.4.0</view>
           <view class="change-log__text">增加「移至顶部」功能</view>
           <view class="change-log__text">交互 & UI优化</view>
         </li>
         <li class="change-log">
-          <view>v1.3.1 [Bugfix]</view>
+          <view>v1.3.1</view>
           <view class="change-log__text">修复无数据时添加失败</view>
         </li>
         <li class="change-log">

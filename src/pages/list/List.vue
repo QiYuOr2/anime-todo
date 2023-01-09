@@ -252,7 +252,7 @@ const reverse = <T>(list: T[]) => {
   padding-bottom: env(safe-area-inset-bottom);
 
   &__title {
-    padding: 22rpx 32rpx 0;
+    padding: 22rpx 32rpx 16rpx;
     font-weight: bold;
   }
 
@@ -260,10 +260,10 @@ const reverse = <T>(list: T[]) => {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
 
-    max-height: 600rpx;
+    max-height: 800rpx;
     overflow-y: auto;
 
-    padding: 16rpx 32rpx;
+    padding: 0 32rpx 16rpx;
 
     x-button {
       padding: 10rpx;

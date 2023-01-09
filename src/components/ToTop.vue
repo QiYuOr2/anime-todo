@@ -22,7 +22,7 @@ const toTop = () => {
   position: fixed;
   bottom: 160rpx;
   right: 30rpx;
-  z-index: 9999;
+  z-index: 1999;
 
   display: flex;
   align-items: center;

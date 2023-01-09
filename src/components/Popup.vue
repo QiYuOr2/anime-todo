@@ -32,7 +32,7 @@ const close = () => {
 
 <template>
   <div v-if="selfVisible" :class="['mask', { 'mask--leave': isLeave }]" @click="close" @touchmove.prevent=""></div>
-  <div v-if="selfVisible" :class="['popup', { 'popup--leave': isLeave }]" @touchmove.prevent="">
+  <div v-if="selfVisible" :class="['popup', { 'popup--leave': isLeave }]">
     <slot></slot>
   </div>
 </template>

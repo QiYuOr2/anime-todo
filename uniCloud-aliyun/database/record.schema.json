@@ -1,0 +1,64 @@
+{
+	"bsonType": "object",
+	"required": [],
+	"permission": {
+		"read": false,
+		"create": false,
+		"update": false,
+		"delete": false
+	},
+	"properties": {
+		"_id": {
+			"description": "ID，系统自动生成"
+		},
+		"user_id": {
+			"title": "用户id",
+			"foreignKey": "user._id",
+			"defaultValue": {
+				"$env": "uid"
+			}
+		},
+		"id": {
+			"title": "番剧id",
+			"bsonType": "int"
+		},
+		"total": {
+			"title": "总集数",
+			"bsonType": "int"
+		},
+		"start": {
+			"title": "开始放送时间",
+			"bsonType": "string"
+		},
+		"weekday": {
+			"title": "放送日",
+			"bsonType": "string"
+		},
+		"thumb": {
+			"title": "缩略图",
+			"bsonType": "string"
+		},
+		"time": {
+			"title": "放送时间",
+			"bsonType": "string"
+		},
+		"tags": {
+			"title": "标签",
+			"bsonType": "array"
+		},
+		"cur": {
+			"title": "已看到的集数",
+			"bsonType": "int",
+			"defaultValue": 0
+		},
+		"img": {
+			"title": "缩略图2",
+			"bsonType": "string"
+		},
+		"is_finish": {
+			"title": "是否看完",
+			"bsonType": "bool",
+			"defaultValue": false
+		}
+	}
+}

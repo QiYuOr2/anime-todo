@@ -7,14 +7,26 @@
       </view>
     </x-section>
     <x-section title="数据">
-      <view class="settings-item" @click="openDataModal">
-        <text>导入数据</text>
-        <x-icon name="arrow-right" />
+      <view class="settings-item" @click="beforeToggleCloudSync">
+        <text>云同步</text>
+        <switch
+          :checked="isCloudSync"
+          color="var(--primary-color)"
+          style="height: 44rpx; transform: scale(0.7); transform-origin: right top"
+        />
       </view>
-      <view class="settings-item" @click="exportJson">
-        <text>导出数据</text>
-        <x-icon name="arrow-right" />
-      </view>
+
+      <template v-if="!isCloudSync">
+        <view class="settings-item" @click="openDataModal">
+          <text>导入数据</text>
+          <x-icon name="arrow-right" />
+        </view>
+        <view class="settings-item" @click="exportJson">
+          <text>导出数据</text>
+          <x-icon name="arrow-right" />
+        </view>
+      </template>
+
       <view class="settings-item" @click="clearJson">
         <text>清除数据</text>
         <x-icon name="arrow-right" />
@@ -41,18 +53,53 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, watchEffect } from "vue";
 import XSection from "./components/Section.vue";
 import XIcon from "@/components/Icon.vue";
 import Modal from "@/components/Modal.vue";
 import XButton from "@/components/Button.vue";
 import { Local } from "@/utils";
 import { Path } from "@/constants/path";
+import { useToggle } from "@vueuse/core";
+import { login } from "@/apis/cloud";
+import { UID } from "@/constants/storage";
 
 const currentColor = ref(0);
 const colors = ["green"];
 const dataModalVisible = ref(false);
 const json = ref("");
+
+const [isCloudSync, toggleCloudSync] = useToggle(false);
+
+const beforeToggleCloudSync = () => {
+  if (isCloudSync.value) {
+    return uni.showModal({
+      title: "云同步关闭确认",
+      content: "关闭云同步后数据将仅在本地保存，并且云同步时不会存入本地",
+      confirmText: "确认关闭",
+      success(result) {
+        if (result.cancel) {
+          return;
+        }
+        if (result.confirm) {
+          toggleCloudSync(false);
+        }
+      },
+    });
+  }
+
+  !uni.getStorageSync(UID)
+    ? uni.login({
+        async success(result) {
+          if (!result.code) {
+            uni.showToast({ icon: "none", title: "开启失败" });
+            return;
+          }
+          login(result.code).then(() => toggleCloudSync(true));
+        },
+      })
+    : toggleCloudSync(true);
+};
 
 const alert = () => {
   uni.showToast({

@@ -1,8 +1,7 @@
 "use strict";
-const { response } = require("../common");
+const { response, config } = require("../common");
 
-const APPID = "wx29813b3365938a41";
-const SECRET = "61f0e2826c395e26b9b338dbbe3ce751";
+const { APPID, SECRET } = config;
 
 const db = uniCloud.database();
 const user = db.collection("user");

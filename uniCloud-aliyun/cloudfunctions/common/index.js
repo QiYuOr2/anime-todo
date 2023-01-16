@@ -6,3 +6,7 @@ exports.response = {
     return { code: 0, message: "success", data };
   },
 };
+
+exports.config = {
+  ...require('./secret')
+}

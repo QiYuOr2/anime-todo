@@ -13,6 +13,7 @@
           :checked="isCloudSync"
           color="var(--primary-color)"
           style="height: 44rpx; transform: scale(0.7); transform-origin: right top"
+          disabled
         />
       </view>
 
@@ -61,15 +62,21 @@ import XButton from "@/components/Button.vue";
 import { Local } from "@/utils";
 import { Path } from "@/constants/path";
 import { useToggle } from "@vueuse/core";
-import { login } from "@/apis/cloud";
-import { UID } from "@/constants/storage";
+import { login, setUserSyncStatus } from "@/apis/cloud";
+import { SYNC_STATUS, UID } from "@/constants/storage";
 
 const currentColor = ref(0);
 const colors = ["green"];
 const dataModalVisible = ref(false);
 const json = ref("");
 
-const [isCloudSync, toggleCloudSync] = useToggle(false);
+const [isCloudSync, _toggleCloudSync] = useToggle(uni.getStorageSync(SYNC_STATUS));
+
+const toggleCloudSync = (value: boolean) =>
+  setUserSyncStatus(uni.getStorageSync(SYNC_STATUS), value).then(() => {
+    _toggleCloudSync(value);
+    uni.setStorageSync(SYNC_STATUS, value);
+  });
 
 const beforeToggleCloudSync = () => {
   if (isCloudSync.value) {
@@ -88,6 +95,10 @@ const beforeToggleCloudSync = () => {
     });
   }
 
+  uni.showLoading({ title: isCloudSync.value ? "关闭中" : "开启中" });
+
+  const toggle = (value: boolean) => toggleCloudSync(value).then(() => uni.hideLoading());
+
   !uni.getStorageSync(UID)
     ? uni.login({
         async success(result) {
@@ -95,10 +106,10 @@ const beforeToggleCloudSync = () => {
             uni.showToast({ icon: "none", title: "开启失败" });
             return;
           }
-          login(result.code).then(() => toggleCloudSync(true));
+          login(result.code).then(() => toggle(true));
         },
       })
-    : toggleCloudSync(true);
+    : toggle(true);
 };
 
 const alert = () => {

@@ -1,18 +1,11 @@
 "use strict";
+const { response } = require("../common");
+
 const APPID = "wx29813b3365938a41";
 const SECRET = "61f0e2826c395e26b9b338dbbe3ce751";
 
 const db = uniCloud.database();
 const user = db.collection("user");
-
-const response = {
-  error(message) {
-    return { code: 1, message, data: null };
-  },
-  success(data) {
-    return { code: 0, message: "success", data };
-  },
-};
 
 const login = async (event, context) => {
   const { code } = event;
@@ -38,13 +31,48 @@ const login = async (event, context) => {
   return response.error("请求错误");
 };
 
+const getUserSyncStatus = async (event, context) => {
+  const { id } = event;
+  const queryResult = await user.where({ _id: id }).get();
+  const resultUser = queryResult?.data?.[0] || {};
+
+  console.log(resultUser);
+
+  if (resultUser._id) {
+    if (resultUser.is_sync === undefined) {
+      resultUser.is_sync = false;
+      await user.where({ _id: id }).update({ is_sync: false });
+    }
+
+    return response.success({ synced: resultUser.is_sync });
+  }
+  return response.error("未找到该用户");
+};
+
+const setUserSyncStatus = async (event, context) => {
+  const { id, synced } = event;
+  const queryResult = await user.where({ _id: id }).get();
+  const resultUser = queryResult?.data?.[0] || {};
+
+  console.log(resultUser);
+
+  if (resultUser._id) {
+    const updateResult = await user.where({ _id: id }).update({ is_sync: synced });
+
+    return updateResult.updated ? response.success() : response.error("更新失败");
+  }
+  return response.error("未找到该用户");
+};
+
 exports.main = async (event, context) => {
-  //event为客户端上传的参数
-  console.log("event : ", event);
   const { eventName } = event;
 
   switch (eventName) {
     case "login":
       return await login(event, context);
+    case "getUserSyncStatus":
+      return await getUserSyncStatus(event, context);
+    case "setUserSyncStatus":
+      return await setUserSyncStatus(event, context);
   }
 };

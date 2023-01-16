@@ -1,10 +1,20 @@
 <script setup lang="ts">
 import { onLaunch, onShow, onHide } from "@dcloudio/uni-app";
+import { getUserSyncStatus } from "./apis/cloud";
+import { SYNC_STATUS, UID } from "./constants/storage";
 import { Local } from "./utils/local";
 
-onLaunch(() => {
+onLaunch(async () => {
   console.log("App Launch");
   Local.create(uni.getFileSystemManager);
+
+  // check Sync Config
+  const uid = uni.getStorageSync(UID);
+
+  const result = await getUserSyncStatus(uid);
+  if (typeof result.data.synced !== "undefined") {
+    uni.setStorageSync(SYNC_STATUS, result.data.synced);
+  }
 });
 onShow(() => {
   console.log("App Show");

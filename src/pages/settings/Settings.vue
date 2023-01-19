@@ -17,7 +17,12 @@
         />
       </view>
 
-      <template v-if="!isCloudSync">
+      <view class="settings-item" @click="openDataModal">
+        <text>本地数据管理</text>
+        <x-icon name="arrow-right" />
+      </view>
+
+      <!-- <template v-if="!isCloudSync">
         <view class="settings-item" @click="openDataModal">
           <text>导入数据</text>
           <x-icon name="arrow-right" />
@@ -31,7 +36,7 @@
       <view class="settings-item" @click="clearJson">
         <text>清除数据</text>
         <x-icon name="arrow-right" />
-      </view>
+      </view> -->
     </x-section>
 
     <x-section title="其他">
@@ -245,33 +250,39 @@ textarea {
 }
 </style>
 
-<style scoped>
+<style lang="scss" scoped>
 .settings-item {
   position: relative;
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 22rpx 32rpx;
+
+  &::after {
+    content: "";
+
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+
+    height: 2rpx;
+    margin: 0 32rpx;
+    background: var(--gray-divider-color);
+  }
+
+  &:last-child::after {
+    display: none;
+  }
+
+  &--disabled {
+
+  }
 }
 /* .settings-item:hover {
   background: var(--gray-divider-color);
 } */
-.settings-item::after {
-  content: "";
 
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-
-  height: 2rpx;
-  margin: 0 32rpx;
-  background: var(--gray-divider-color);
-}
-
-.settings-item:last-child::after {
-  display: none;
-}
 .theme-color {
   width: 54rpx;
   height: 30rpx;

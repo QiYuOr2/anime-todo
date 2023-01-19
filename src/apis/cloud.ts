@@ -1,13 +1,21 @@
 import { UID } from "@/constants/storage";
 
-export async function login(code: string): Promise<{ id: string }> {
+async function cloud(url: CloudAPI, data: Record<string, any>) {
+  const [scope, event] = url.split("/");
+
   const { result } = await uniCloud.callFunction({
-    name: "user",
+    name: scope,
     data: {
-      eventName: "login",
-      code,
+      eventName: event,
+      ...data,
     },
   });
+
+  return result;
+}
+
+export async function login(code: string): Promise<{ id: string }> {
+  const result = await cloud("user/login", { code });
 
   if (result.data.id) {
     uni.setStorageSync(UID, result.data.id);
@@ -16,27 +24,10 @@ export async function login(code: string): Promise<{ id: string }> {
   return result;
 }
 
-export async function getUserSyncStatus(id: string) {
-  const { result } = await uniCloud.callFunction({
-    name: "user",
-    data: {
-      eventName: "getUserSyncStatus",
-      id,
-    },
-  });
-
-  return result;
+export function getUserSyncStatus(id: string) {
+  return cloud("user/getUserSyncStatus", { id });
 }
 
-export async function setUserSyncStatus(id: string, synced: boolean) {
-  const { result } = await uniCloud.callFunction({
-    name: "user",
-    data: {
-      eventName: "setUserSyncStatus",
-      id,
-      synced,
-    },
-  });
-
-  return result;
+export function setUserSyncStatus(id: string, synced: boolean) {
+  return cloud("user/setUserSyncStatus", { id, synced });
 }

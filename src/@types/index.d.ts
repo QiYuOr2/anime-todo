@@ -56,3 +56,21 @@ declare interface SearchDTO {
   list: AnimeDTO[];
   results: number;
 }
+
+type OneOf<T extends Array<string | symbol | number>> = T[number];
+
+declare type CloudAPI = OneOf<
+  [
+    "user/login",
+    "user/getUserSyncStatus",
+    "user/setUserSyncStatus",
+
+    "record/getOne",
+    "record/getList",
+    "record/addRecord",
+    "record/removeRecord",
+    "record/modifyRecord",
+    "record/modifyProgress",
+    "record/moveToTop"
+  ]
+>;

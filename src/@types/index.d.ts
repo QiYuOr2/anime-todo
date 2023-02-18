@@ -74,3 +74,9 @@ declare type CloudAPI = OneOf<
     "record/moveToTop"
   ]
 >;
+
+declare interface CloudResponse<T> {
+  code: number;
+  message: string;
+  data: T;
+}

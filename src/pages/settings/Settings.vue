@@ -17,26 +17,10 @@
         />
       </view>
 
-      <view class="settings-item" @click="openDataModal">
+      <view :class="['settings-item', { 'settings-item--disabled': isCloudSync }]" @click="toLocalData">
         <text>本地数据管理</text>
-        <x-icon name="arrow-right" />
+        <x-icon name="arrow-right" color="currentColor" />
       </view>
-
-      <!-- <template v-if="!isCloudSync">
-        <view class="settings-item" @click="openDataModal">
-          <text>导入数据</text>
-          <x-icon name="arrow-right" />
-        </view>
-        <view class="settings-item" @click="exportJson">
-          <text>导出数据</text>
-          <x-icon name="arrow-right" />
-        </view>
-      </template>
-
-      <view class="settings-item" @click="clearJson">
-        <text>清除数据</text>
-        <x-icon name="arrow-right" />
-      </view> -->
     </x-section>
 
     <x-section title="其他">
@@ -45,16 +29,6 @@
         <x-icon name="arrow-right" />
       </view>
     </x-section>
-
-    <modal v-model:visible="dataModalVisible" title="粘贴要导入的数据">
-      <view class="textarea">
-        <textarea :value="json" @input="jsonInputHandler" class="textarea__core" maxlength="9999999999" auto-height />
-      </view>
-      <view class="actions">
-        <x-button @click="importJson">确定导入</x-button>
-        <x-button @click="example">示例数据</x-button>
-      </view>
-    </modal>
   </view>
 </template>
 
@@ -62,12 +36,10 @@
 import { ref, watchEffect } from "vue";
 import XSection from "./components/Section.vue";
 import XIcon from "@/components/Icon.vue";
-import Modal from "@/components/Modal.vue";
-import XButton from "@/components/Button.vue";
 import { Local } from "@/utils";
 import { Path } from "@/constants/path";
 import { useToggle } from "@vueuse/core";
-import { login, setUserSyncStatus } from "@/apis/cloud";
+import { user } from "@/apis/cloud";
 import { SYNC_STATUS, UID } from "@/constants/storage";
 
 const currentColor = ref(0);
@@ -78,7 +50,7 @@ const json = ref("");
 const [isCloudSync, _toggleCloudSync] = useToggle(uni.getStorageSync(SYNC_STATUS));
 
 const toggleCloudSync = (value: boolean) =>
-  setUserSyncStatus(uni.getStorageSync(SYNC_STATUS), value).then(() => {
+  user.setUserSyncStatus(uni.getStorageSync(SYNC_STATUS), value).then(() => {
     _toggleCloudSync(value);
     uni.setStorageSync(SYNC_STATUS, value);
   });
@@ -111,7 +83,7 @@ const beforeToggleCloudSync = () => {
             uni.showToast({ icon: "none", title: "开启失败" });
             return;
           }
-          login(result.code).then(() => toggle(true));
+          user.login(result.code).then(() => toggle(true));
         },
       })
     : toggle(true);
@@ -228,6 +200,10 @@ const clearJson = () => {
 const toAbout = () => {
   uni.navigateTo({ url: Path.About });
 };
+
+const toLocalData = () => {
+  isCloudSync.value ? uni.showToast({ icon: "none", title: "开启云同步后无法使用本地数据" }) : uni.navigateTo({ url: Path.LocalData });
+};
 </script>
 
 <style>
@@ -276,7 +252,7 @@ textarea {
   }
 
   &--disabled {
-
+    color: var(--gray-text-color);
   }
 }
 /* .settings-item:hover {

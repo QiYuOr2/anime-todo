@@ -3,5 +3,6 @@ export enum Path {
   Settings = "/pages/settings/Settings",
   About = "/pages/settings/About",
   Search = "/pages/list/Search",
-  Detail = '/pages/list/Detail'
+  Detail = "/pages/list/Detail",
+  LocalData = "/pages/settings/LocalData",
 }

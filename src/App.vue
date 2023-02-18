@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onLaunch, onShow, onHide } from "@dcloudio/uni-app";
-import { getUserSyncStatus } from "./apis/cloud";
+import { user } from "./apis/cloud";
 import { SYNC_STATUS, UID } from "./constants/storage";
 import { Local } from "./utils/local";
 
@@ -11,7 +11,7 @@ onLaunch(async () => {
   // check Sync Config
   const uid = uni.getStorageSync(UID);
 
-  const result = await getUserSyncStatus(uid);
+  const result = await user.getUserSyncStatus(uid);
   if (typeof result.data.synced !== "undefined") {
     uni.setStorageSync(SYNC_STATUS, result.data.synced);
   }

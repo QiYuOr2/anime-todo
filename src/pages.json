@@ -19,6 +19,12 @@
       }
     },
     {
+      "path": "pages/settings/LocalData",
+      "style": {
+        "navigationBarTitleText": "本地数据"
+      }
+    },
+    {
       "path": "pages/list/Search",
       "style": {
         "navigationBarTitleText": "添加",

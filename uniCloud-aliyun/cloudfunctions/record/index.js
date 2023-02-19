@@ -28,7 +28,7 @@ const controllers = {
       }
       const queryOptions = { user_id: uid };
       if (type !== "all") {
-        queryOptions.is_finish = type === "doing" ? false : true;
+        queryOptions.is_finish = type !== "doing";
       }
 
       const queryResult = await record.where(queryOptions).get();

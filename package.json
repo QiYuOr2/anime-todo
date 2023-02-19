@@ -47,6 +47,7 @@
     "@dcloudio/uni-mp-weixin": "^3.0.0-alpha-3040220220310005",
     "@dcloudio/uni-quickapp-webview": "^3.0.0-alpha-3040220220310005",
     "@vueuse/core": "^8.5.0",
+    "papaparse": "^5.3.2",
     "vue": "^3.2.31",
     "vue-i18n": "^9.1.9",
     "vuex": "^4.0.2"
@@ -56,6 +57,7 @@
     "@dcloudio/uni-automator": "^3.0.0-alpha-3040220220310005",
     "@dcloudio/uni-cli-shared": "^3.0.0-alpha-3040220220310005",
     "@dcloudio/vite-plugin-uni": "^3.0.0-alpha-3040220220310005",
+    "@types/papaparse": "^5.3.7",
     "sass": "^1.54.0",
     "typescript": "^4.6.2",
     "vite": "^2.8.6"

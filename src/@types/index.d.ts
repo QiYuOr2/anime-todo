@@ -8,6 +8,7 @@ declare interface Anime {
   cur: number;
   thumb: string;
   tags: string[];
+  is_finish?: boolean
 }
 
 declare interface LocalList {
